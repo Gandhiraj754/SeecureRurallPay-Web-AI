@@ -2,7 +2,7 @@
 
 # 🔐 SecureRuralPay Web AI v3.0
 
-### *Lightweight Cybersecurity Framework for Rural Digital Banking — Fusion Forge '26 Hackathon*
+### *Lightweight Cybersecurity Framework for Rural Digital Banking*
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0.3-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
