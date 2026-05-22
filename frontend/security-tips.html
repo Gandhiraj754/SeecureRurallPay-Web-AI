@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Security Tips — SecureRuralPay</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+    <meta name="theme-color" content="#1d4ed8" />
+    <style>
+        .tip-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 16px;
+            margin-bottom: 14px;
+            border-left: 5px solid #1d4ed8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .07);
+        }
+
+        .tip-card.danger {
+            border-left-color: #dc2626;
+        }
+
+        .tip-card.warn {
+            border-left-color: #d97706;
+        }
+
+        .tip-card.safe {
+            border-left-color: #16a34a;
+        }
+
+        .tip-title {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-body {
+            font-size: 0.9rem;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .tip-body ul {
+            margin: 8px 0 0 16px;
+        }
+
+        .tip-body li {
+            margin-bottom: 4px;
+        }
+
+        .scam-badge {
+            display: inline-block;
+            background: #fee2e2;
+            color: #b91c1c;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .safe-badge {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .section-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #6b7280;
+            margin: 22px 0 10px;
+        }
+
+        .quiz-card {
+            background: linear-gradient(135deg, #1e40af, #7c3aed);
+            color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+        }
+
+        .quiz-opt {
+            background: rgba(255, 255, 255, .15);
+            border: 2px solid rgba(255, 255, 255, .3);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .quiz-opt:hover {
+            background: rgba(255, 255, 255, .28);
+        }
+
+        .quiz-opt.correct {
+            background: #16a34a;
+            border-color: #16a34a;
+        }
+
+        .quiz-opt.wrong {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .cyber-meter {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .cyber-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        .cyber-stat:last-child {
+            border-bottom: none;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-green {
+            background: #16a34a;
+        }
+
+        .dot-red {
+            background: #dc2626;
+        }
+
+        .dot-yellow {
+            background: #d97706;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="offline-banner" id="offlineBanner" role="alert">
+        <span>📵</span><span>Offline — Tips still available</span>
+    </div>
+
+    <header class="topbar">
+        <a href="index.html" class="btn btn-sm"
+            style="width:auto;min-height:36px;padding:0 14px;background:rgba(255,255,255,.18);color:#fff;font-weight:700">←
+            Back</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">🛡️</div>
+            <span>Security Tips</span>
+        </div>
+    </header>
+
+    <div class="container content-area" style="padding-top:16px">
+
+        <!-- Live Security Status -->
+        <div class="cyber-meter">
+            <p style="font-weight:800;margin-bottom:4px;font-size:0.95rem">🔒 Your Security Status</p>
+            <div class="cyber-stat">
+                <span>App connection</span>
+                <span style="display:flex;align-items:center;gap:6px;font-weight:700;color:#16a34a">
+                    <span class="status-dot dot-green"></span>Encrypted (HTTPS)
+                </span>
+            </div>
+            <div class="cyber-stat">
+                <span>Device trust</span>
+                <span style="display:flex;align-items:center;gap:6px;font-weight:700;color:#16a34a" id="deviceStatus">
+                    <span class="status-dot dot-green"></span>Trusted
+                </span>
+            </div>
+            <div class="cyber-stat">
+                <span>Last login</span>
+                <span style="font-weight:700;color:#374151" id="lastLogin">--</span>
+            </div>
+            <div class="cyber-stat">
+                <span>Sessions active</span>
+                <span style="font-weight:700;color:#374151">1</span>
+            </div>
+        </div>
+
+        <!-- Quick Quiz -->
+        <div class="quiz-card">
+            <p style="font-size:0.8rem;font-weight:700;opacity:.8;margin-bottom:6px">🧠 SECURITY QUIZ</p>
+            <p style="font-size:1rem;font-weight:800" id="quizQ">Someone calls saying they are from your bank and asks
+                for your OTP. What do you do?</p>
+            <div class="quiz-opt" onclick="answer(this, false)">Give the OTP — they said it's urgent</div>
+            <div class="quiz-opt" onclick="answer(this, true)">Hang up immediately — banks NEVER ask for OTP</div>
+            <div class="quiz-opt" onclick="answer(this, false)">Give only half the OTP</div>
+            <p id="quizResult" style="margin-top:12px;font-weight:700;font-size:0.95rem;display:none"></p>
+        </div>
+
+        <!-- SCAM ALERTS -->
+        <p class="section-label">⚠️ SCAMS HAPPENING NOW — STAY ALERT</p>
+
+        <div class="tip-card danger">
+            <div class="tip-title">📞 Fake KYC Call Scam <span class="scam-badge">VERY COMMON</span></div>
+            <div class="tip-body">
+                Scammer calls saying your bank account will be closed unless you complete KYC.
+                They ask for your OTP, card number, or to install a remote app.
+                <ul>
+                    <li><strong>Your bank will NEVER call asking for OTP or PIN</strong></li>
+                    <li>Hang up immediately and call your bank's official number</li>
+                    <li>Never install apps someone asks you to install by phone</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tip-card danger">
+            <div class="tip-title">💸 UPI Money Request Scam <span class="scam-badge">VERY COMMON</span></div>
+            <div class="tip-body">
+                Scammer sends a UPI <strong>COLLECT REQUEST</strong> saying "Enter your PIN to receive money."
+                Entering your PIN on a collect request <strong>SENDS money — it does NOT receive it!</strong>
+                <ul>
+                    <li>To <strong>receive</strong> money, you NEVER need to enter your PIN</li>
+                    <li>PIN is only needed when YOU are sending money</li>
+                    <li>Decline all unknown collect requests immediately</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tip-card danger">
+            <div class="tip-title">🔗 Fake Bank Website Link <span class="scam-badge">RISING</span></div>
+            <div class="tip-body">
+                Scammers create websites that look exactly like your bank's website.
+                They send the link via WhatsApp or SMS.
+                <ul>
+                    <li>Always check the URL — real bank: <strong>sbi.co.in</strong>, Fake:
+                        <strong>sbi-login.net</strong></li>
+                    <li>Use <strong>Check a Website Link</strong> in this app before clicking any link</li>
+                    <li>Never enter your PIN/password on websites received via SMS</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tip-card warn">
+            <div class="tip-title">📲 Screen Share / AnyDesk Scam <span class="scam-badge">DANGER</span></div>
+            <div class="tip-body">
+                Scammer asks you to install AnyDesk or TeamViewer and share your screen "to help you."
+                Once you share, they can see everything — your bank apps, OTPs, PINs.
+                <ul>
+                    <li>NEVER share your screen with a stranger</li>
+                    <li>Delete AnyDesk/TeamViewer if a stranger asked you to install it</li>
+                    <li>Change your PIN and OTP immediately if you shared your screen</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tip-card warn">
+            <div class="tip-title">🎁 Lottery / Prize Scam</div>
+            <div class="tip-body">
+                Message says you won a prize, lottery, or government money. To receive it, you must pay a small "tax" or
+                "processing fee."
+                <ul>
+                    <li>No real lottery requires you to pay to receive the prize</li>
+                    <li>Government schemes never ask for money via UPI</li>
+                    <li>Delete such messages immediately</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SAFE HABITS -->
+        <p class="section-label">✅ SAFE HABITS — PROTECT YOURSELF</p>
+
+        <div class="tip-card safe">
+            <div class="tip-title">🔑 Strong PIN Rules <span class="safe-badge">DO THIS</span></div>
+            <div class="tip-body">
+                <ul>
+                    <li>Never use your birthday, phone number, or 1234 as PIN</li>
+                    <li>Use a different PIN for UPI, ATM, and phone lock</li>
+                    <li>Change your UPI PIN every 3 months</li>
+                    <li>Never share PIN with anyone — even family or bank staff</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tip-card safe">
+            <div class="tip-title">📱 Safe Phone Habits <span class="safe-badge">DO THIS</span></div>
+            <div class="tip-body">
+                <ul>
+                    <li>Always lock your phone with a PIN or fingerprint</li>
+                    <li>Do not let strangers use your banking apps</li>
+                    <li>Log out of banking apps after use on shared phones</li>
+                    <li>Disable WhatsApp OTP auto-read on banking apps</li>
+                    <li>Keep your phone's software updated</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tip-card safe">
+            <div class="tip-title">🌐 Safe Internet Habits <span class="safe-badge">DO THIS</span></div>
+            <div class="tip-body">
+                <ul>
+                    <li>Avoid doing banking on public Wi-Fi (tea stalls, stations)</li>
+                    <li>Always check links before clicking — use our Link Checker</li>
+                    <li>Only download banking apps from official app stores</li>
+                    <li>Never save your banking password in a browser</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- What To Do If Scammed -->
+        <p class="section-label">🆘 IF YOU GOT SCAMMED — ACT FAST</p>
+        <div class="tip-card" style="border-left-color:#7c3aed;background:#faf5ff">
+            <div class="tip-title" style="color:#7c3aed">⚡ Act within 30 minutes — you can recover the money!</div>
+            <div class="tip-body">
+                <ul>
+                    <li><strong>Step 1:</strong> Call <strong>1930</strong> — National Cybercrime Helpline (24x7, Free)
+                    </li>
+                    <li><strong>Step 2:</strong> Call your bank's helpline immediately</li>
+                    <li><strong>Step 3:</strong> File complaint at <strong>cybercrime.gov.in</strong></li>
+                    <li><strong>Step 4:</strong> Block your UPI and card from your banking app</li>
+                    <li><strong>Step 5:</strong> Change all your PINs and passwords</li>
+                </ul>
+                <div
+                    style="margin-top:12px;background:#ede9fe;border-radius:8px;padding:10px;font-weight:700;color:#5b21b6;text-align:center">
+                    📞 Cybercrime Helpline: <span style="font-size:1.2rem">1930</span> (Free, 24x7)
+                </div>
+            </div>
+        </div>
+
+        <div style="height:20px"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="nav-bottom">
+        <a href="index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>Home</span></a>
+        <a href="send-money.html" class="nav-item"><span class="nav-item-icon">💸</span><span>Send</span></a>
+        <a href="check-link.html" class="nav-item"><span class="nav-item-icon">🔗</span><span>Links</span></a>
+        <a href="history.html" class="nav-item"><span class="nav-item-icon">📋</span><span>History</span></a>
+        <a href="security-tips.html" class="nav-item active"><span class="nav-item-icon">🛡️</span><span>Tips</span></a>
+    </nav>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="js/offline.js"></script>
+    <script src="js/i18n.js"></script>
+    <script>
+        // Quiz logic
+        let answered = false;
+        function answer(el, correct) {
+            if (answered) return;
+            answered = true;
+            const result = document.getElementById('quizResult');
+            if (correct) {
+                el.classList.add('correct');
+                el.textContent = '✅ ' + el.textContent + ' -- CORRECT!';
+                result.textContent = '✅ That\'s right! Banks never ask for OTP. Hang up on any such call.';
+                result.style.color = '#16a34a';
+            } else {
+                el.classList.add('wrong');
+                result.textContent = '❌ Wrong! Banks NEVER ask for your OTP. Always hang up and call your bank\'s official number.';
+                result.style.color = '#dc2626';
+            }
+            result.style.display = 'block';
+        }
+
+        // Live status
+        document.getElementById('lastLogin').textContent =
+            new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    </script>
+</body>
+
+</html>

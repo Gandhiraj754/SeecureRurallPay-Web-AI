@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check Bank Statement — SecureRuralPay</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+    <meta name="theme-color" content="#1d4ed8" />
+</head>
+
+<body>
+    <div class="offline-banner" id="offlineBanner" role="alert">
+        <span>📵</span><span data-i18n="offline-msg">Offline — PDF analysis requires internet connection</span>
+    </div>
+
+    <header class="topbar">
+        <a href="index.html" class="btn btn-sm"
+            style="width:auto;min-height:36px;padding:0 12px;background:rgba(255,255,255,.15);color:#fff;font-weight:600">←
+            Back</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">📄</div><span>Statement Scan</span>
+        </div>
+        <button class="lang-toggle" onclick="toggleLang()">EN / हि</button>
+    </header>
+
+    <div class="container content-area" style="padding-top:20px">
+
+        <!-- Hero Card -->
+        <div class="card fade-in" style="background:linear-gradient(135deg,#065f46,#047857);color:#fff">
+            <div style="font-size:2rem;margin-bottom:8px">📄</div>
+            <h1 style="font-size:1.1rem;font-weight:800;margin-bottom:6px" data-i18n="pdf-hero-head">Check Your Bank
+                Statement</h1>
+            <p style="font-size:0.88rem;opacity:.9;line-height:1.5" data-i18n="pdf-hero-sub">
+                Upload your bank statement PDF. Our AI reads every payment
+                and finds any fraud or suspicious transactions for you.
+            </p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="card" id="uploadSection">
+            <h2 class="card-title" data-i18n="pdf-upload-title">📁 Upload Bank Statement</h2>
+            <p class="card-subtitle" data-i18n="pdf-upload-sub">Supports SBI, HDFC, ICICI, Axis, Canara PDFs</p>
+
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('pdfFile').click()"
+                ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+                <input type="file" id="pdfFile" accept=".pdf" onchange="fileSelected(event)" />
+                <div class="upload-icon" id="uploadIcon">📄</div>
+                <div class="upload-text" id="uploadText" data-i18n="pdf-tap">Tap here to choose your PDF file</div>
+                <div class="upload-hint" id="uploadHint" data-i18n="pdf-drag">Or drag and drop your bank statement here
+                </div>
+            </div>
+
+            <div id="fileInfo" style="display:none;margin-top:14px">
+                <div class="result-box info">
+                    <span class="result-icon">📄</span>
+                    <div>
+                        <div class="result-title" id="fileName">File selected</div>
+                        <div class="result-msg" id="fileSize"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary mt-16" id="analyzeBtn" onclick="analyzePDF()" style="display:none">
+                <span class="btn-icon">🔍</span>
+                <span>FIND FRAUD IN MY STATEMENT</span>
+            </button>
+
+            <div class="alert-strip mt-16">
+                🔒 Your PDF is analyzed privately. It is NOT shared with anyone.
+            </div>
+        </div>
+
+        <!-- Processing Steps -->
+        <div class="card" id="processingCard" style="display:none">
+            <h2 class="card-title">🔍 Analyzing Your Statement</h2>
+            <p class="card-subtitle">Please wait while AI checks your transactions</p>
+
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:16px" id="stepsList">
+                <div class="step-item" id="pStep1">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <span id="pStep1Icon" style="font-size:1.3rem">⏳</span>
+                        <div>
+                            <div style="font-weight:600;font-size:0.9rem">Reading your PDF file</div>
+                            <div style="font-size:0.78rem;color:var(--color-muted)">Extracting text from document</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item" id="pStep2">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <span id="pStep2Icon" style="font-size:1.3rem">⏳</span>
+                        <div>
+                            <div style="font-weight:600;font-size:0.9rem">Finding all transactions</div>
+                            <div style="font-size:0.78rem;color:var(--color-muted)">Reading amounts, dates, descriptions
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item" id="pStep3">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <span id="pStep3Icon" style="font-size:1.3rem">⏳</span>
+                        <div>
+                            <div style="font-weight:600;font-size:0.9rem">Checking each payment</div>
+                            <div style="font-size:0.78rem;color:var(--color-muted)">Running AI fraud detection</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item" id="pStep4">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <span id="pStep4Icon" style="font-size:1.3rem">⏳</span>
+                        <div>
+                            <div style="font-weight:600;font-size:0.9rem">Checking payment networks</div>
+                            <div style="font-size:0.78rem;color:var(--color-muted)">Looking for money transfer fraud
+                                patterns</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item" id="pStep5">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <span id="pStep5Icon" style="font-size:1.3rem">⏳</span>
+                        <div>
+                            <div style="font-weight:600;font-size:0.9rem">Making your report</div>
+                            <div style="font-size:0.78rem;color:var(--color-muted)">Writing the results clearly</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-wrap mt-16">
+                <div class="progress-label"><span id="pStepLabel">Starting...</span><span id="pPct">0%</span></div>
+                <div class="progress-bg">
+                    <div class="progress-fill" id="pProgress" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report -->
+        <div id="reportSection" style="display:none">
+            <!-- Summary -->
+            <div class="card fade-in">
+                <h2 class="card-title">📊 Your Statement Report</h2>
+                <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+                    <div class="stat-card text-center" style="border-color:#fca5a5">
+                        <div class="stat-num" id="rFraud" style="color:#dc2626">0</div>
+                        <div class="stat-label">❌ Fraud Found</div>
+                    </div>
+                    <div class="stat-card text-center" style="border-color:#fde047">
+                        <div class="stat-num" id="rSusp" style="color:#ca8a04">0</div>
+                        <div class="stat-label">⚠️ Suspicious</div>
+                    </div>
+                    <div class="stat-card text-center" style="border-color:#86efac">
+                        <div class="stat-num" id="rSafe" style="color:#16a34a">0</div>
+                        <div class="stat-label">✅ Safe</div>
+                    </div>
+                </div>
+
+                <div class="result-box" id="reportVerdict" style="margin-top:16px">
+                    <span class="result-icon" id="reportVerdictIcon">📊</span>
+                    <div>
+                        <div class="result-title" id="reportVerdictTitle">Checking...</div>
+                        <div class="result-msg" id="reportVerdictMsg"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction List -->
+            <div class="card">
+                <h2 class="card-title">All Transactions</h2>
+                <div class="tx-list" id="txDetailList"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card">
+                <h2 class="card-title" style="margin-bottom:14px">What to Do Next</h2>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                    <button class="btn btn-danger" id="reportBankBtn" onclick="reportToBank()" style="display:none">
+                        📞 Report Fraud to Bank
+                    </button>
+                    <button class="btn btn-outline" onclick="downloadReport()">
+                        📥 Download Report (PDF)
+                    </button>
+                    <button class="btn btn-outline" onclick="resetPDF()">
+                        🔄 Check Another Statement
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Button -->
+        <div class="card" style="border-left:3px solid #7c3aed">
+            <p style="font-size:0.8rem;font-weight:700;color:#7c3aed;margin-bottom:8px">🧪 DEMO — See how it works</p>
+            <button class="btn btn-primary" onclick="runDemo()">
+                📄 Run Demo (Sample Statement)
+            </button>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>Home</span></a>
+        <a href="send-money.html" class="nav-item"><span class="nav-item-icon">💸</span><span>Send</span></a>
+        <a href="check-link.html" class="nav-item"><span class="nav-item-icon">🔗</span><span>Links</span></a>
+        <a href="history.html" class="nav-item"><span class="nav-item-icon">📋</span><span>History</span></a>
+        <a href="admin/dashboard.html" class="nav-item"><span class="nav-item-icon">⚙️</span><span>Admin</span></a>
+    </nav>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="js/offline.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/pdf-analyzer.js"></script>
+</body>
+
+</html>

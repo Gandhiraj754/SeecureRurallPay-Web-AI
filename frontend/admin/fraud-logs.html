@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fraud Logs — SecureRuralPay Admin</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/mobile.css" />
+    <meta name="theme-color" content="#1d4ed8" />
+</head>
+
+<body style="background:#f1f5f9">
+    <header class="topbar" style="background:linear-gradient(135deg,#0f172a,#1e3a8a)">
+        <a href="dashboard.html" style="color:rgba(255,255,255,.7);font-size:0.85rem;text-decoration:none">←
+            Dashboard</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">🚨</div><span>Fraud Logs</span>
+        </div>
+        <button class="btn btn-sm"
+            style="background:rgba(255,255,255,.15);color:#fff;width:auto;padding:0 12px;min-height:36px"
+            onclick="exportCSV()">📥 Export</button>
+    </header>
+
+    <div class="container content-area" style="padding-top:20px;max-width:1200px">
+        <!-- Filters -->
+        <div class="card">
+            <h2 class="card-title">🔍 Filter Logs</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label" style="font-size:0.8rem">Type</label>
+                    <select class="form-input" id="filterType" onchange="applyFilters()" style="min-height:44px">
+                        <option value="all">All Types</option>
+                        <option value="fraud">❌ Fraud</option>
+                        <option value="suspicious">⚠️ Suspicious</option>
+                        <option value="phishing">🔗 Phishing Link</option>
+                        <option value="pdf">📄 PDF Fraud</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label" style="font-size:0.8rem">Sort By</label>
+                    <select class="form-input" id="sortBy" onchange="applyFilters()" style="min-height:44px">
+                        <option value="time">Latest First</option>
+                        <option value="risk">Highest Risk</option>
+                        <option value="amount">Highest Amount</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group mt-12" style="margin-bottom:0">
+                <input class="form-input" type="search" id="searchInput" placeholder="Search by user, amount, type..."
+                    oninput="applyFilters()" />
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat-card text-center" style="border-color:#fca5a5">
+                <div class="stat-num" id="totalFraud" style="color:#dc2626">0</div>
+                <div class="stat-label">Total Fraud</div>
+            </div>
+            <div class="stat-card text-center">
+                <div class="stat-num" id="totalSusp" style="color:#ca8a04">0</div>
+                <div class="stat-label">Suspicious</div>
+            </div>
+            <div class="stat-card text-center" style="border-color:#86efac">
+                <div class="stat-num" id="totalSaved" style="color:#16a34a;font-size:1.2rem">₹0</div>
+                <div class="stat-label">Amount Saved</div>
+            </div>
+        </div>
+
+        <!-- Logs Table -->
+        <div class="card" style="padding:0;overflow:hidden">
+            <div class="scroll-x">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date &amp; Time</th>
+                            <th>User</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Risk</th>
+                            <th>Action</th>
+                            <th>Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span><span>Overview</span></a>
+        <a href="fraud-logs.html" class="nav-item active"><span class="nav-item-icon">🚨</span><span>Fraud</span></a>
+        <a href="users.html" class="nav-item"><span class="nav-item-icon">👥</span><span>Users</span></a>
+        <a href="model.html" class="nav-item"><span class="nav-item-icon">🤖</span><span>Model</span></a>
+        <a href="../index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>App</span></a>
+    </nav>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="../js/offline.js"></script>
+    <script>
+        const allLogs = [];
+        const types = ['fraud', 'fraud', 'suspicious', 'phishing', 'pdf'];
+        const actions = ['Transaction Blocked', 'User Alerted & OTP Required', 'Link Blocked', 'PDF Flagged'];
+        const now = new Date();
+        for (let i = 0; i < 50; i++) {
+            const t = types[Math.floor(Math.random() * types.length)];
+            const d = new Date(now.getTime() - Math.random() * 30 * 86400000);
+            allLogs.push({
+                id: `FL${String(i + 1).padStart(4, '0')}`,
+                date: d.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+                user: '9' + Math.floor(Math.random() * 9e9 + 1e9).toString().slice(1, 5) + '•••' + Math.floor(1000 + Math.random() * 9000),
+                amount: Math.floor(500 + Math.random() * 20000),
+                type: t,
+                risk: t === 'fraud' ? 72 + Math.floor(Math.random() * 28) : 31 + Math.floor(Math.random() * 39),
+                action: actions[Math.floor(Math.random() * actions.length)],
+                ts: d.getTime()
+            });
+        }
+
+        let filtered = [...allLogs];
+
+        function applyFilters() {
+            const type = document.getElementById('filterType').value;
+            const sort = document.getElementById('sortBy').value;
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            filtered = allLogs.filter(l =>
+                (type === 'all' || l.type === type) &&
+                (!q || l.user.includes(q) || l.type.includes(q) || l.amount.toString().includes(q))
+            );
+            if (sort === 'time') filtered.sort((a, b) => b.ts - a.ts);
+            else if (sort === 'risk') filtered.sort((a, b) => b.risk - a.risk);
+            else filtered.sort((a, b) => b.amount - a.amount);
+            renderLogs();
+            updateStats();
+        }
+
+        function renderLogs() {
+            const typeIcon = { fraud: '❌', suspicious: '⚠️', phishing: '🔗', pdf: '📄' };
+            const typeBadge = { fraud: 'badge-danger', suspicious: 'badge-warn', phishing: 'badge-warn', pdf: 'badge-info' };
+            document.getElementById('logsBody').innerHTML = filtered.slice(0, 30).map(l => `
+        <tr>
+          <td style="font-size:0.8rem">${l.date}</td>
+          <td style="font-weight:600">${l.user}</td>
+          <td style="font-weight:700">₹${l.amount.toLocaleString('en-IN')}</td>
+          <td><span class="badge ${typeBadge[l.type]}">${typeIcon[l.type]} ${l.type}</span></td>
+          <td><span class="badge ${l.risk >= 71 ? 'badge-danger' : 'badge-warn'}">${l.risk}</span></td>
+          <td style="font-size:0.8rem">${l.action}</td>
+          <td>
+            <button class="btn btn-sm btn-outline" style="width:auto;padding:0 10px;min-height:32px;font-size:0.75rem" onclick="blockUser('${l.user}')">Block</button>
+          </td>
+        </tr>`).join('');
+        }
+
+        function updateStats() {
+            const fraud = filtered.filter(l => l.type === 'fraud');
+            const susp = filtered.filter(l => l.type === 'suspicious');
+            document.getElementById('totalFraud').textContent = fraud.length;
+            document.getElementById('totalSusp').textContent = susp.length;
+            document.getElementById('totalSaved').textContent = '₹' + fraud.reduce((s, l) => s + l.amount, 0).toLocaleString('en-IN');
+        }
+
+        function blockUser(user) { alert('User ' + user + ' reported to bank system. Account flagged for review.'); }
+
+        function exportCSV() {
+            const rows = ['ID,Date,User,Amount,Type,Risk,Action'].concat(
+                filtered.map(l => `${l.id},${l.date},${l.user},${l.amount},${l.type},${l.risk},${l.action}`)
+            );
+            const a = document.createElement('a'); a.href = 'data:text/csv,' + encodeURIComponent(rows.join('\n'));
+            a.download = 'fraud_logs.csv'; a.click();
+        }
+
+        applyFilters();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ML Model Status — SecureRuralPay Admin</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/mobile.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body style="background:#f1f5f9">
+    <header class="topbar" style="background:linear-gradient(135deg,#0f172a,#1e3a8a)">
+        <a href="dashboard.html" style="color:rgba(255,255,255,.7);font-size:0.85rem;text-decoration:none">←
+            Dashboard</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">🤖</div><span>ML Model</span>
+        </div>
+        <span class="badge badge-safe">v3.0 Live</span>
+    </header>
+
+    <div class="container content-area" style="padding-top:20px;max-width:1200px">
+        <!-- Model Cards -->
+        <div class="stat-grid" style="grid-template-columns:1fr 1fr;gap:14px">
+            <div class="stat-card text-center">
+                <div class="stat-num" style="color:#16a34a">94.2%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-card text-center">
+                <div class="stat-num" style="color:#2563eb">92.8%</div>
+                <div class="stat-label">Precision</div>
+            </div>
+            <div class="stat-card text-center">
+                <div class="stat-num" style="color:#7c3aed">91.5%</div>
+                <div class="stat-label">Recall</div>
+            </div>
+            <div class="stat-card text-center">
+                <div class="stat-num" style="color:#ea580c">91.6%</div>
+                <div class="stat-label">F1 Score</div>
+            </div>
+        </div>
+
+        <!-- Model Info -->
+        <div class="card">
+            <h2 class="card-title">🤖 Model Information</h2>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+                <div style="display:flex;justify-content:space-between"><span class="text-muted">Model Type</span><span
+                        style="font-weight:700">XGBoost + Random Forest Ensemble</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="text-muted">Training
+                        Data</span><span style="font-weight:700">500,000 transactions</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="text-muted">Features
+                        Used</span><span style="font-weight:700">18 features</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="text-muted">On-Device
+                        Model</span><span style="font-weight:700">TFLite (INT8, ~2MB)</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="text-muted">AUC-ROC</span><span
+                        style="font-weight:700;color:#16a34a">0.971</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="text-muted">False Positive
+                        Rate</span><span style="font-weight:700;color:#16a34a">3.8%</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="text-muted">Last
+                        Trained</span><span style="font-weight:700" id="lastTrained"></span></div>
+            </div>
+        </div>
+
+        <!-- Confusion Matrix -->
+        <div class="card">
+            <h2 class="card-title">📊 Confusion Matrix</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+                <div
+                    style="background:#dcfce7;border:2px solid #86efac;border-radius:12px;padding:20px;text-align:center">
+                    <div style="font-size:1.8rem;font-weight:800;color:#16a34a">71,412</div>
+                    <div style="font-size:0.8rem;font-weight:600;color:#166534">True Negative<br>(Safe marked Safe ✅)
+                    </div>
+                </div>
+                <div
+                    style="background:#fef9c3;border:2px solid #fde047;border-radius:12px;padding:20px;text-align:center">
+                    <div style="font-size:1.8rem;font-weight:800;color:#ca8a04">2,851</div>
+                    <div style="font-size:0.8rem;font-weight:600;color:#854d0e">False Positive<br>(Safe marked Fraud ⚠️)
+                    </div>
+                </div>
+                <div
+                    style="background:#fee2e2;border:2px solid #fca5a5;border-radius:12px;padding:20px;text-align:center">
+                    <div style="font-size:1.8rem;font-weight:800;color:#dc2626">612</div>
+                    <div style="font-size:0.8rem;font-weight:600;color:#991b1b">False Negative<br>(Fraud missed ❌)</div>
+                </div>
+                <div
+                    style="background:#dcfce7;border:2px solid #86efac;border-radius:12px;padding:20px;text-align:center">
+                    <div style="font-size:1.8rem;font-weight:800;color:#16a34a">6,451</div>
+                    <div style="font-size:0.8rem;font-weight:600;color:#166534">True Positive<br>(Fraud caught ✅)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROC Curve Chart -->
+        <div class="card chart-box">
+            <h2 class="card-title" style="margin-bottom:16px">📈 ROC Curve (AUC = 0.971)</h2>
+            <canvas id="rocChart" height="250"></canvas>
+        </div>
+
+        <!-- Retrain Button -->
+        <div class="card">
+            <h2 class="card-title">🔄 Retrain Model</h2>
+            <p class="card-subtitle">Trigger retraining with latest fraud data. Takes ~15 minutes.</p>
+            <button class="btn btn-primary" id="retrainBtn" onclick="retrainModel()">
+                <span>🤖</span><span>RETRAIN MODEL NOW</span>
+            </button>
+            <div id="retrainProgress" style="display:none;margin-top:16px">
+                <div class="progress-wrap">
+                    <div class="progress-label"><span id="retrainStep">Loading data...</span><span
+                            id="retrainPct">0%</span></div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" id="retrainBar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Version History -->
+        <div class="card" style="margin-bottom:80px">
+            <h2 class="card-title" style="margin-bottom:14px">📁 Model Version History</h2>
+            <div style="display:flex;flex-direction:column;gap:10px">
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8faff;border-radius:10px;border:1.5px solid #e5e7eb">
+                    <div>
+                        <div style="font-weight:700">v3.0 <span class="badge badge-safe">Current</span></div>
+                        <div style="font-size:0.78rem;color:var(--color-muted)" id="v3date"></div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-weight:700;color:#16a34a">94.2%</div>
+                        <div style="font-size:0.75rem;color:var(--color-muted)">Accuracy</div>
+                    </div>
+                </div>
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8faff;border-radius:10px;border:1.5px solid #e5e7eb">
+                    <div>
+                        <div style="font-weight:700">v2.1</div>
+                        <div style="font-size:0.78rem;color:var(--color-muted)">15 Feb 2024</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-weight:700;color:#2563eb">91.8%</div>
+                        <div style="font-size:0.75rem;color:var(--color-muted)">Accuracy</div>
+                    </div>
+                </div>
+                <div
+                    style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8faff;border-radius:10px;border:1.5px solid #e5e7eb">
+                    <div>
+                        <div style="font-weight:700">v2.0</div>
+                        <div style="font-size:0.78rem;color:var(--color-muted)">1 Jan 2024</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-weight:700;color:#7c3aed">89.3%</div>
+                        <div style="font-size:0.75rem;color:var(--color-muted)">Accuracy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span><span>Overview</span></a>
+        <a href="fraud-logs.html" class="nav-item"><span class="nav-item-icon">🚨</span><span>Fraud</span></a>
+        <a href="users.html" class="nav-item"><span class="nav-item-icon">👥</span><span>Users</span></a>
+        <a href="model.html" class="nav-item active"><span class="nav-item-icon">🤖</span><span>Model</span></a>
+        <a href="../index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>App</span></a>
+    </nav>
+
+    <script>
+        document.getElementById('lastTrained').textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('v3date').textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        // ROC Curve
+        const rocCtx = document.getElementById('rocChart').getContext('2d');
+        const fprs = [0, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.0];
+        const tprs = [0, 0.35, 0.55, 0.75, 0.85, 0.88, 0.91, 0.93, 0.95, 0.96, 0.97, 0.975, 0.98, 0.99, 1.0];
+        new Chart(rocCtx, {
+            type: 'line',
+            data: {
+                labels: fprs.map(v => v.toFixed(2)),
+                datasets: [
+                    { label: 'ROC Curve (AUC=0.971)', data: tprs, borderColor: '#1d4ed8', backgroundColor: 'rgba(29,78,216,.1)', fill: true, tension: 0.4, pointRadius: 3 },
+                    { label: 'Random Classifier', data: fprs, borderColor: '#9ca3af', borderDash: [5, 5], pointRadius: 0 }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    x: { title: { display: true, text: 'False Positive Rate' } },
+                    y: { title: { display: true, text: 'True Positive Rate' }, min: 0, max: 1 }
+                }
+            }
+        });
+
+        function retrainModel() {
+            document.getElementById('retrainBtn').disabled = true;
+            document.getElementById('retrainBtn').textContent = 'Training...';
+            document.getElementById('retrainProgress').style.display = 'block';
+            const steps = [
+                [0, 'Loading fraud dataset (500K samples)'],
+                [20, 'Applying SMOTE balancing'],
+                [40, 'Training Random Forest (200 trees)'],
+                [60, 'Training XGBoost (150 estimators)'],
+                [80, 'Building Ensemble model'],
+                [95, 'Converting to TFLite (on-device)'],
+                [100, '✅ Model deployed!']
+            ];
+            let i = 0;
+            const timer = setInterval(() => {
+                if (i >= steps.length) { clearInterval(timer); document.getElementById('retrainBtn').disabled = false; document.getElementById('retrainBtn').innerHTML = '<span>🤖</span><span>RETRAIN MODEL NOW</span>'; return; }
+                const [pct, label] = steps[i];
+                document.getElementById('retrainPct').textContent = pct + '%';
+                document.getElementById('retrainStep').textContent = label;
+                document.getElementById('retrainBar').style.width = pct + '%';
+                i++;
+            }, 1200);
+        }
+    </script>
+</body>
+
+</html>

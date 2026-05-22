@@ -1,0 +1,71 @@
+/* ============================================================
+   SecureRuralPay — Mobile-First Overrides
+   ============================================================ */
+
+/* Ensure full-bleed on small screens */
+@media (max-width: 360px) {
+    html {
+        font-size: 15px;
+    }
+
+    .pin-box {
+        width: 52px;
+        height: 52px;
+        font-size: 1.4rem;
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .card {
+        padding: 18px 14px;
+    }
+}
+
+/* Touch target override for small screens */
+@media (hover: none) and (pointer: coarse) {
+    .btn {
+        min-height: 56px;
+    }
+
+    .nav-item {
+        min-height: 56px;
+    }
+
+    .form-input {
+        min-height: 54px;
+    }
+}
+
+/* Sunlight readability — ensure contrast in bright conditions */
+.card,
+.form-input,
+.tx-item {
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Android Go optimization — reduce animation overhead */
+@media (max-device-memory: 1gb) {
+
+    .hero::before,
+    .hero::after {
+        display: none;
+    }
+
+    * {
+        animation-duration: 0.1ms !important;
+    }
+}
+
+/* Content bottom padding for fixed nav */
+.content-area {
+    padding-bottom: 80px;
+}
+
+/* Scrollable content */
+.scroll-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}

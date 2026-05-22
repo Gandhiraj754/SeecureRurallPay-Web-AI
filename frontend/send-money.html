@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Send Money — SecureRuralPay</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+    <meta name="theme-color" content="#1d4ed8" />
+    <style>
+        /* ── Extra clarity styles for this page ── */
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--color-text);
+            margin-bottom: 4px;
+        }
+
+        .page-sub {
+            font-size: 0.95rem;
+            color: var(--color-muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .form-label {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-input {
+            font-size: 1.05rem;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #d1d5db;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            border-color: #1d4ed8;
+            outline: none;
+            box-shadow: 0 0 0 3px #dbeafe;
+        }
+
+        .form-hint {
+            font-size: 0.88rem;
+            color: var(--color-muted);
+            margin-top: 5px;
+        }
+
+        .section-note {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #1e40af;
+            margin-bottom: 18px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .lang-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            border-color: #1d4ed8;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .result-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .tag-safe {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .tag-warn {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .tag-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="offline-banner" id="offlineBanner" role="alert">
+        <span>📵</span><span id="t-offline">No internet — Payment will be saved and sent later</span>
+    </div>
+
+    <header class="topbar">
+        <a href="index.html" class="btn btn-sm"
+            style="width:auto;min-height:36px;padding:0 14px;background:rgba(255,255,255,.18);color:#fff;font-weight:700">←
+            <span id="t-back">Back</span></a>
+        <div class="topbar-brand">
+            <div class="brand-icon">💸</div>
+            <span id="t-title">Send Money</span>
+        </div>
+        <!-- Language selector -->
+        <div style="position:relative">
+            <button class="lang-toggle" onclick="toggleLangMenu()" id="langToggleBtn">🌐 EN</button>
+            <div id="langMenu"
+                style="display:none;position:absolute;right:0;top:44px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:999;min-width:130px">
+                <button onclick="setLang('en')" class="lang-menu-item" id="lm-en">🇬🇧 English</button>
+                <button onclick="setLang('hi')" class="lang-menu-item" id="lm-hi">🇮🇳 हिंदी</button>
+                <button onclick="setLang('ta')" class="lang-menu-item" id="lm-ta">🇮🇳 தமிழ்</button>
+                <button onclick="setLang('te')" class="lang-menu-item" id="lm-te">🇮🇳 తెలుగు</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container content-area" style="padding-top:18px">
+
+        <!-- AI Safety Notice -->
+        <div class="section-note">
+            <span style="font-size:1.3rem">🤖</span>
+            <span id="t-ai-notice">Our AI checks every payment <strong>before</strong> it is sent. Your money is always
+                protected.</span>
+        </div>
+
+        <!-- Send Money Form -->
+        <div class="card fade-in">
+            <h1 class="page-title" id="t-form-title">💸 Send Money</h1>
+            <p class="page-sub" id="t-form-sub">Fill in the details below. AI will check if the payment is safe before
+                sending.</p>
+
+            <!-- Amount -->
+            <div class="form-group">
+                <label class="form-label" for="amountInput" id="t-lbl-amount">💰 How much do you want to send?
+                    (₹)</label>
+                <input class="form-input" type="number" id="amountInput" placeholder="e.g. 500" inputmode="decimal"
+                    min="1" max="100000" oninput="onAmountChange()" />
+                <p class="form-hint" id="t-hint-amount">Minimum ₹1 — Maximum ₹1,00,000</p>
+            </div>
+
+            <!-- Recipient -->
+            <div class="form-group">
+                <label class="form-label" for="recipientInput" id="t-lbl-recipient">👤 Who do you want to send
+                    to?</label>
+                <input class="form-input" type="text" id="recipientInput" placeholder="e.g. 9876543210 or name@upi"
+                    oninput="onRecipientChange()" />
+                <p class="form-hint" id="recipientHint" style="margin-top:5px">Enter their phone number or UPI ID (like
+                    name@upi)</p>
+            </div>
+
+            <!-- Note -->
+            <div class="form-group">
+                <label class="form-label" for="noteInput" id="t-lbl-note">📝 What is this payment for? <span
+                        style="font-weight:400;color:var(--color-muted)" id="t-optional">(Optional)</span></label>
+                <input class="form-input" type="text" id="noteInput" id="t-placeholder-note"
+                    placeholder="e.g. Grocery, Rent, Medical" />
+            </div>
+
+            <button class="btn btn-primary" id="checkBtn" onclick="checkTransactionSafety()"
+                style="font-size:1rem;padding:16px">
+                <span class="btn-icon">🔍</span>
+                <span id="checkBtnText">CHECK IF THIS PAYMENT IS SAFE</span>
+            </button>
+
+            <p style="text-align:center;margin-top:12px;font-size:0.82rem;color:var(--color-muted)" id="t-check-note">
+                🛡️ AI scans your payment in seconds. No extra charge.
+            </p>
+        </div>
+
+        <!-- Loading / AI Checking -->
+        <div class="card" id="loadingCard" style="display:none">
+            <div class="loading-wrap">
+                <div class="spinner"></div>
+                <p class="loading-text" id="t-loading">AI is checking your payment...</p>
+            </div>
+            <div class="steps" id="checkSteps" style="margin-top:16px">
+                <div class="step" id="cs1"></div>
+                <div class="step" id="cs2"></div>
+                <div class="step" id="cs3"></div>
+                <div class="step" id="cs4"></div>
+                <div class="step" id="cs5"></div>
+            </div>
+            <div id="checkStepLabel" class="text-center text-muted mt-8" style="font-size:0.85rem"></div>
+        </div>
+
+        <!-- Result Card -->
+        <div id="resultCard" style="display:none">
+
+            <!-- Risk Meter -->
+            <div class="card fade-in">
+                <h2 class="card-title" id="t-result-heading">Safety Check Result</h2>
+                <div class="risk-meter-wrap">
+                    <p class="risk-label" id="t-risk-label">Risk Score</p>
+                    <div class="risk-score-num" id="riskScore">--</div>
+                    <p class="risk-label" id="t-out-of">out of 100</p>
+                    <div class="meter-bar-bg" style="margin-top:10px">
+                        <div class="meter-bar-fill safe" id="riskBar" style="width:0%"></div>
+                    </div>
+                    <div
+                        style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.8rem;color:var(--color-muted)">
+                        <span id="t-score-safe">0 — Safe ✅</span>
+                        <span id="t-score-warn">50 — Risky ⚠️</span>
+                        <span id="t-score-danger">100 — Fraud ❌</span>
+                    </div>
+                </div>
+
+                <!-- Verdict -->
+                <div class="result-box" id="verdictBox" style="margin-top:16px">
+                    <span class="result-icon" id="verdictIcon">🔍</span>
+                    <div>
+                        <div class="result-title" id="verdictTitle" style="font-size:1.1rem">Checking...</div>
+                        <div class="result-msg" id="verdictMsg" style="font-size:0.95rem;margin-top:4px"></div>
+                    </div>
+                </div>
+
+                <!-- Feature Pills -->
+                <div class="feature-pills" id="featurePills" style="margin-top:14px"></div>
+            </div>
+
+            <!-- ⚠️ OTP Confirmation -->
+            <div class="card" id="otpConfirmCard" style="display:none">
+                <h2 class="card-title">⚠️ <span id="t-otp-title">Extra Confirmation Needed</span></h2>
+                <p class="card-subtitle" id="t-otp-sub">This payment looks a little different. Please enter the code
+                    sent to your phone to confirm.</p>
+                <div class="form-group">
+                    <label class="form-label" id="t-otp-lbl">Enter the 6-digit code from your SMS</label>
+                    <input class="form-input" type="text" id="txOtpInput" placeholder="_ _ _ _ _ _" maxlength="6"
+                        inputmode="numeric" style="text-align:center;font-size:1.6rem;letter-spacing:.35em" />
+                </div>
+                <button class="btn btn-warn" onclick="confirmWithOTP()">
+                    <span class="btn-icon">✅</span>
+                    <span id="t-confirm-btn">CONFIRM AND SEND MONEY</span>
+                </button>
+            </div>
+
+            <!-- ✅ Safe — Send Button -->
+            <div id="sendBtnWrap" style="display:none">
+                <button class="btn btn-safe" id="sendBtn" onclick="sendMoney()" style="font-size:1rem;padding:16px">
+                    <span class="btn-icon">✅</span>
+                    <span id="sendBtnText">SEND MONEY NOW</span>
+                </button>
+            </div>
+
+            <!-- ❌ Blocked — Fraud -->
+            <div class="card" id="blockCard" style="display:none">
+                <div class="result-box danger">
+                    <span class="result-icon">🚫</span>
+                    <div>
+                        <div class="result-title" id="t-blocked-title">Payment Stopped — Fraud Detected</div>
+                        <div class="result-msg" id="t-blocked-msg">
+                            Our AI found this payment is unsafe. We stopped it to protect your money. Do NOT send this
+                            payment.
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-outline mt-16" onclick="reportFraud()">
+                    📢 <span id="t-report-btn">Report This to Your Bank</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ✅ Success Screen -->
+        <div class="card fade-in" id="successCard" style="display:none">
+            <div class="text-center">
+                <div style="font-size:3.5rem;margin-bottom:12px">✅</div>
+                <h2 class="card-title" id="successTitle">Money Sent Safely!</h2>
+                <p class="card-subtitle" id="successMsg">Your payment was checked and protected by AI</p>
+            </div>
+            <div class="result-box safe" style="margin-top:16px">
+                <span class="result-icon">🛡️</span>
+                <div>
+                    <div class="result-title" id="t-tx-complete">Transaction Complete</div>
+                    <div class="result-msg" id="txSummary"></div>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-16" onclick="resetForm()" id="t-send-another">Send Another
+                Payment</button>
+            <a href="history.html" class="btn btn-outline mt-8" id="t-view-history">📋 View My Payment History</a>
+        </div>
+
+        <!-- Demo Section -->
+        <div class="card" style="border-left:4px solid #7c3aed;margin-top:4px">
+            <p style="font-size:0.82rem;font-weight:700;color:#7c3aed;margin-bottom:10px">🧪 <span
+                    id="t-demo-label">DEMO — Test AI Detection</span></p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-sm btn-outline" onclick="demoSafe()">✅ <span id="t-demo-safe">Safe
+                        Payment</span></button>
+                <button class="btn btn-sm btn-warn" onclick="demoWarn()">⚠️ <span
+                        id="t-demo-warn">Suspicious</span></button>
+                <button class="btn btn-sm btn-danger" onclick="demoFraud()">❌ <span
+                        id="t-demo-fraud">Fraud</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="nav-bottom">
+        <a href="index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span id="t-nav-home">Home</span></a>
+        <a href="send-money.html" class="nav-item active"><span class="nav-item-icon">💸</span><span
+                id="t-nav-send">Send</span></a>
+        <a href="check-link.html" class="nav-item"><span class="nav-item-icon">🔗</span><span
+                id="t-nav-link">Links</span></a>
+        <a href="history.html" class="nav-item"><span class="nav-item-icon">📋</span><span
+                id="t-nav-hist">History</span></a>
+        <a href="admin/dashboard.html" class="nav-item"><span class="nav-item-icon">⚙️</span><span
+                id="t-nav-admin">Admin</span></a>
+    </nav>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="js/offline.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/transaction.js"></script>
+
+    <style>
+        .lang-menu-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 9px 14px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .lang-menu-item:hover {
+            background: #f3f4f6;
+        }
+
+        .lang-menu-item.active {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+    </style>
+    <script>
+        // ── Language Translations ──────────────────────────────────────────
+        const T = {
+            en: {
+                'html-lang': 'en',
+                't-back': 'Back',
+                't-title': 'Send Money',
+                't-offline': 'No internet — Payment will be saved and sent later',
+                't-ai-notice': 'Our AI checks every payment <strong>before</strong> it is sent. Your money is always protected.',
+                't-form-title': '💸 Send Money',
+                't-form-sub': 'Fill in the details below. AI will check if the payment is safe before sending.',
+                't-lbl-amount': '💰 How much do you want to send? (₹)',
+                't-hint-amount': 'Minimum ₹1 — Maximum ₹1,00,000',
+                't-lbl-recipient': '👤 Who do you want to send to?',
+                'recipientHint': 'Enter their phone number or UPI ID (like name@upi)',
+                't-lbl-note': '📝 What is this payment for?',
+                't-optional': '(Optional)',
+                'checkBtnText': 'CHECK IF THIS PAYMENT IS SAFE',
+                't-check-note': '🛡️ AI scans your payment in seconds. No extra charge.',
+                't-loading': 'AI is checking your payment...',
+                't-result-heading': 'Safety Check Result',
+                't-risk-label': 'Risk Score',
+                't-out-of': 'out of 100',
+                't-score-safe': '0 — Safe ✅',
+                't-score-warn': '50 — Risky ⚠️',
+                't-score-danger': '100 — Fraud ❌',
+                't-otp-title': 'Extra Confirmation Needed',
+                't-otp-sub': 'This payment looks a little different. Please enter the code sent to your phone to confirm.',
+                't-otp-lbl': 'Enter the 6-digit code from your SMS',
+                't-confirm-btn': 'CONFIRM AND SEND MONEY',
+                'sendBtnText': 'SEND MONEY NOW',
+                't-blocked-title': 'Payment Stopped — Fraud Detected',
+                't-blocked-msg': 'Our AI found this payment is unsafe. We stopped it to protect your money. Do NOT send this payment.',
+                't-report-btn': 'Report This to Your Bank',
+                'successTitle': 'Money Sent Safely! ✅',
+                'successMsg': 'Your payment was checked and protected by AI',
+                't-tx-complete': 'Transaction Complete',
+                't-send-another': 'Send Another Payment',
+                't-view-history': '📋 View My Payment History',
+                't-demo-label': 'DEMO — Test AI Detection',
+                't-demo-safe': 'Safe Payment',
+                't-demo-warn': 'Suspicious',
+                't-demo-fraud': 'Fraud',
+                't-nav-home': 'Home', 't-nav-send': 'Send', 't-nav-link': 'Links', 't-nav-hist': 'History', 't-nav-admin': 'Admin',
+                'langBtn': '🌐 EN'
+            },
+            hi: {
+                'html-lang': 'hi',
+                't-back': 'वापस',
+                't-title': 'पैसे भेजें',
+                't-offline': 'इंटरनेट नहीं — पैसे बाद में भेजे जाएंगे',
+                't-ai-notice': 'हमारा AI हर भुगतान भेजने से <strong>पहले</strong> जांचता है। आपका पैसा हमेशा सुरक्षित है।',
+                't-form-title': '💸 पैसे भेजें',
+                't-form-sub': 'नीचे जानकारी भरें। AI भेजने से पहले जांचेगा।',
+                't-lbl-amount': '💰 आप कितने पैसे भेजना चाहते हैं? (₹)',
+                't-hint-amount': 'कम से कम ₹1 — अधिकतम ₹1,00,000',
+                't-lbl-recipient': '👤 आप किसे भेजना चाहते हैं?',
+                'recipientHint': 'फोन नंबर या UPI ID डालें (जैसे name@upi)',
+                't-lbl-note': '📝 यह भुगतान किसलिए है?',
+                't-optional': '(वैकल्पिक)',
+                'checkBtnText': 'पैसे भेजना सुरक्षित है?',
+                't-check-note': '🛡️ AI कुछ ही सेकंड में जांच करेगा। कोई शुल्क नहीं।',
+                't-loading': 'AI आपका भुगतान जांच रहा है...',
+                't-result-heading': 'सुरक्षा जांच परिणाम',
+                't-risk-label': 'जोखिम स्कोर',
+                't-out-of': '100 में से',
+                't-score-safe': '0 — सुरक्षित ✅',
+                't-score-warn': '50 — संदिग्ध ⚠️',
+                't-score-danger': '100 — धोखाधड़ी ❌',
+                't-otp-title': 'अतिरिक्त पुष्टि आवश्यक',
+                't-otp-sub': 'यह भुगतान थोड़ा अलग लग रहा है। कृपया अपने फोन पर आया कोड डालें।',
+                't-otp-lbl': 'SMS से 6-अंकों का कोड डालें',
+                't-confirm-btn': 'पुष्टि करें और पैसे भेजें',
+                'sendBtnText': 'अभी पैसे भेजें',
+                't-blocked-title': 'भुगतान रोका गया — धोखाधड़ी मिली',
+                't-blocked-msg': 'AI ने पाया कि यह भुगतान असुरक्षित है। हमने इसे रोक दिया। यह पैसे मत भेजें।',
+                't-report-btn': 'बैंक को रिपोर्ट करें',
+                'successTitle': 'पैसे सुरक्षित भेजे गए! ✅',
+                'successMsg': 'AI ने आपके भुगतान को जांचकर सुरक्षित भेजा।',
+                't-tx-complete': 'लेनदेन पूरा',
+                't-send-another': 'और पैसे भेजें',
+                't-view-history': '📋 मेरा इतिहास देखें',
+                't-demo-label': 'DEMO — AI जांच परीक्षण',
+                't-demo-safe': 'सुरक्षित',
+                't-demo-warn': 'संदिग्ध',
+                't-demo-fraud': 'धोखाधड़ी',
+                't-nav-home': 'होम', 't-nav-send': 'भेजें', 't-nav-link': 'लिंक', 't-nav-hist': 'इतिहास', 't-nav-admin': 'एडमिन',
+                'langBtn': '🌐 हिंदी'
+            },
+            ta: {
+                'html-lang': 'ta',
+                't-back': 'திரும்பு',
+                't-title': 'பணம் அனுப்பு',
+                't-offline': 'இணையம் இல்லை — பணம் பின்னர் அனுப்பப்படும்',
+                't-ai-notice': 'நமது AI ஒவ்வொரு பணப் பரிவர்த்தனையையும் அனுப்புவதற்கு <strong>முன்பு</strong> சரிபார்க்கிறது.',
+                't-form-title': '💸 பணம் அனுப்பு',
+                't-form-sub': 'கீழே விவரங்களை நிரப்பவும். AI பாதுகாப்பை சரிபார்க்கும்.',
+                't-lbl-amount': '💰 நீங்கள் எவ்வளவு பணம் அனுப்ப விரும்புகிறீர்கள்? (₹)',
+                't-hint-amount': 'குறைந்தது ₹1 — அதிகபட்சம் ₹1,00,000',
+                't-lbl-recipient': '👤 யாருக்கு அனுப்ப விரும்புகிறீர்கள்?',
+                'recipientHint': 'தொலைபேசி எண் அல்லது UPI ID உள்ளிடவும் (எ.கா. name@upi)',
+                't-lbl-note': '📝 இந்த பணம் எதற்காக?',
+                't-optional': '(விரும்பினால்)',
+                'checkBtnText': 'பணம் அனுப்புவது பாதுகாப்பானதா?',
+                't-check-note': '🛡️ AI சில நொடிகளில் சரிபார்க்கும். கட்டணம் இல்லை.',
+                't-loading': 'AI உங்கள் பணப் பரிவர்த்தனையை சரிபார்க்கிறது...',
+                't-result-heading': 'பாதுகாப்பு சோதனை முடிவு',
+                't-risk-label': 'ஆபத்து மதிப்பெண்',
+                't-out-of': '100 இல்',
+                't-score-safe': '0 — பாதுகாப்பானது ✅',
+                't-score-warn': '50 — சந்தேகமானது ⚠️',
+                't-score-danger': '100 — மோசடி ❌',
+                't-otp-title': 'கூடுதல் உறுதிப்படுத்தல் தேவை',
+                't-otp-sub': 'இந்த பணப் பரிவர்த்தனை கொஞ்சம் வித்தியாசமாக தெரிகிறது. உங்கள் தொலைபேசிக்கு வந்த குறியீட்டை உள்ளிடவும்.',
+                't-otp-lbl': 'SMS இலிருந்து 6 இலக்க குறியீட்டை உள்ளிடவும்',
+                't-confirm-btn': 'உறுதிப்படுத்தி பணம் அனுப்பு',
+                'sendBtnText': 'இப்போது பணம் அனுப்பு',
+                't-blocked-title': 'பணம் நிறுத்தப்பட்டது — மோசடி கண்டுபிடிக்கப்பட்டது',
+                't-blocked-msg': 'AI இந்த பணப் பரிவர்த்தனை பாதுகாப்பற்றது என்று கண்டறிந்தது. நாங்கள் இதை நிறுத்தினோம். இந்த பணம் அனுப்பாதீர்கள்.',
+                't-report-btn': 'உங்கள் வங்கிக்கு புகார் செய்யவும்',
+                'successTitle': 'பணம் பாதுகாப்பாக அனுப்பப்பட்டது! ✅',
+                'successMsg': 'உங்கள் பணம் AI ஆல் சரிபார்க்கப்பட்டு அனுப்பப்பட்டது',
+                't-tx-complete': 'பரிவர்த்தனை முடிந்தது',
+                't-send-another': 'மற்றொரு பணம் அனுப்பு',
+                't-view-history': '📋 என் வரலாற்றை பார்',
+                't-demo-label': 'DEMO — AI சோதனை',
+                't-demo-safe': 'பாதுகாப்பானது',
+                't-demo-warn': 'சந்தேகமானது',
+                't-demo-fraud': 'மோசடி',
+                't-nav-home': 'முகப்பு', 't-nav-send': 'அனுப்பு', 't-nav-link': 'இணைப்பு', 't-nav-hist': 'வரலாறு', 't-nav-admin': 'நிர்வாகி',
+                'langBtn': '🌐 தமிழ்'
+            },
+            te: {
+                'html-lang': 'te',
+                't-back': 'తిరిగి',
+                't-title': 'డబ్బు పంపు',
+                't-offline': 'ఇంటర్నెట్ లేదు — చెల్లింపు తర్వాత పంపబడుతుంది',
+                't-ai-notice': 'మన AI ప్రతి చెల్లింపును పంపే <strong>ముందు</strong> తనిఖీ చేస్తుంది. మీ డబ్బు ఎప్పుడూ సురక్షితం.',
+                't-form-title': '💸 డబ్బు పంపు',
+                't-form-sub': 'దిగువ వివరాలు నమోదు చేయండి. AI పంపే ముందు సురక్షితత తనిఖీ చేస్తుంది.',
+                't-lbl-amount': '💰 మీరు ఎంత డబ్బు పంపాలనుకుంటున్నారు? (₹)',
+                't-hint-amount': 'కనిష్టం ₹1 — గరిష్టం ₹1,00,000',
+                't-lbl-recipient': '👤 మీరు ఎవరికి పంపాలనుకుంటున్నారు?',
+                'recipientHint': 'ఫోన్ నంబర్ లేదా UPI ID నమోదు చేయండి (ఉదా. name@upi)',
+                't-lbl-note': '📝 ఈ చెల్లింపు దేనికి?',
+                't-optional': '(ఐచ్ఛికం)',
+                'checkBtnText': 'ఈ చెల్లింపు సురక్షితమేనా?',
+                't-check-note': '🛡️ AI కొన్ని సెకన్లలో తనిఖీ చేస్తుంది. అదనపు ఛార్జీ లేదు.',
+                't-loading': 'AI మీ చెల్లింపును తనిఖీ చేస్తోంది...',
+                't-result-heading': 'భద్రతా తనిఖీ ఫలితం',
+                't-risk-label': 'ప్రమాద స్కోరు',
+                't-out-of': '100 లో',
+                't-score-safe': '0 — సురక్షితం ✅',
+                't-score-warn': '50 — అనుమానాస్పదం ⚠️',
+                't-score-danger': '100 — మోసం ❌',
+                't-otp-title': 'అదనపు నిర్ధారణ అవసరం',
+                't-otp-sub': 'ఈ చెల్లింపు కొంచెం భిన్నంగా కనిపిస్తోంది. మీ ఫోన్‌కు వచ్చిన కోడ్ నమోదు చేయండి.',
+                't-otp-lbl': 'SMS నుండి 6 అంకెల కోడ్ నమోదు చేయండి',
+                't-confirm-btn': 'నిర్ధారించి డబ్బు పంపు',
+                'sendBtnText': 'ఇప్పుడు డబ్బు పంపు',
+                't-blocked-title': 'చెల్లింపు ఆపివేయబడింది — మోసం గుర్తించబడింది',
+                't-blocked-msg': 'AI ఈ చెల్లింపు అసురక్షితమని గుర్తించింది. మేము దాన్ని ఆపివేసాము. ఈ డబ్బు పంపవద్దు.',
+                't-report-btn': 'మీ బ్యాంకుకు నివేదించండి',
+                'successTitle': 'డబ్బు సురక్షితంగా పంపబడింది! ✅',
+                'successMsg': 'మీ చెల్లింపు AI ద్వారా తనిఖీ చేయబడి పంపబడింది',
+                't-tx-complete': 'లావాదేవీ పూర్తైంది',
+                't-send-another': 'మరొక చెల్లింపు పంపు',
+                't-view-history': '📋 నా చరిత్ర చూడు',
+                't-demo-label': 'DEMO — AI తనిఖీ పరీక్ష',
+                't-demo-safe': 'సురక్షితం',
+                't-demo-warn': 'అనుమానాస్పదం',
+                't-demo-fraud': 'మోసం',
+                't-nav-home': 'హోమ్', 't-nav-send': 'పంపు', 't-nav-link': 'లింక్', 't-nav-hist': 'చరిత్ర', 't-nav-admin': 'అడ్మిన్',
+                'langBtn': '🌐 తెలుగు'
+            }
+        };
+
+        let currentLang = localStorage.getItem('srp_lang') || 'en';
+
+        function applyLang(lang) {
+            const t = T[lang];
+            if (!t) return;
+            document.documentElement.lang = t['html-lang'];
+            Object.keys(t).forEach(id => {
+                if (id === 'html-lang') return;
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = t[id];
+            });
+            // Update active state in menu
+            ['en', 'hi', 'ta', 'te'].forEach(l => {
+                const btn = document.getElementById('lm-' + l);
+                if (btn) btn.classList.toggle('active', l === lang);
+            });
+            document.getElementById('langToggleBtn').textContent = t['langBtn'];
+            localStorage.setItem('srp_lang', lang);
+            currentLang = lang;
+        }
+
+        function setLang(lang) {
+            applyLang(lang);
+            document.getElementById('langMenu').style.display = 'none';
+        }
+
+        function toggleLangMenu() {
+            const menu = document.getElementById('langMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Close on outside click
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#langToggleBtn') && !e.target.closest('#langMenu')) {
+                const m = document.getElementById('langMenu');
+                if (m) m.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => applyLang(currentLang));
+    </script>
+</body>
+
+</html>

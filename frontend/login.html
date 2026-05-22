@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="SecureRuralPay Login — Enter your phone number and secret PIN to access secure banking." />
+    <title>Login — SecureRuralPay</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+    <meta name="theme-color" content="#1d4ed8" />
+</head>
+
+<body>
+    <div class="offline-banner" id="offlineBanner" role="alert">
+        <span>📵</span><span>No internet — Login works offline</span>
+    </div>
+
+    <header class="topbar">
+        <a href="index.html" class="btn btn-sm btn-outline"
+            style="width:auto;min-height:36px;padding:0 12px;border-color:rgba(255,255,255,.4);color:#fff">← Back</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">🔐</div>
+            <span>Login</span>
+        </div>
+        <button class="lang-toggle" onclick="toggleLang()">EN / हि</button>
+    </header>
+
+    <!-- Step progress bar -->
+    <div class="container" style="padding-top:20px">
+        <div class="steps" id="stepBar">
+            <div class="step active" id="step1"></div>
+            <div class="step" id="step2"></div>
+            <div class="step" id="step3"></div>
+        </div>
+        <p class="text-muted text-center" id="stepLabel" style="font-size:0.8rem;margin-bottom:16px">Step 1 of 3 — Enter
+            your details</p>
+    </div>
+
+    <!-- SCREEN 1: Phone + PIN -->
+    <div class="container" id="screen1">
+        <div class="card fade-in">
+            <h1 class="card-title" id="s1-title">🔐 Enter Your Details</h1>
+            <p class="card-subtitle" id="s1-sub">Your phone number and secret code</p>
+
+            <div class="form-group">
+                <label class="form-label" for="phoneInput" id="lbl-phone">📱 Your Phone Number</label>
+                <input class="form-input" type="tel" id="phoneInput" placeholder="Enter 10-digit number" maxlength="10"
+                    inputmode="numeric" autocomplete="tel" required aria-describedby="phone-hint" />
+                <p class="form-hint" id="phone-hint">Example: 9876543210</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" id="lbl-pin">🔑 Your Secret Code (PIN)</label>
+                <div class="pin-row" role="group" aria-label="PIN entry">
+                    <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin1"
+                        aria-label="PIN digit 1" />
+                    <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin2"
+                        aria-label="PIN digit 2" />
+                    <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin3"
+                        aria-label="PIN digit 3" />
+                    <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin4"
+                        aria-label="PIN digit 4" />
+                </div>
+                <p class="form-hint text-center" id="pin-hint">4 secret numbers only you know</p>
+            </div>
+
+            <!-- Attempts indicator -->
+            <div class="result-box warn" id="attemptsWarning" style="display:none">
+                <span class="result-icon">⚠️</span>
+                <div>
+                    <div class="result-title" id="attWarnTitle">Wrong code</div>
+                    <div class="result-msg" id="attWarnMsg">Please try again carefully</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary mt-16" id="loginBtn" onclick="handleLogin()">
+                <span class="btn-icon">🔓</span>
+                <span id="loginBtnText">LOGIN</span>
+            </button>
+
+            <div class="divider"></div>
+            <p class="text-center text-muted" style="font-size:0.85rem">
+                <a href="#" style="color:var(--color-primary);font-weight:600" id="forgotPin">Forgot PIN? Get Help</a>
+            </p>
+        </div>
+
+        <!-- Security note -->
+        <div class="alert-strip">
+            🛡️ <strong>Safe:</strong> Your PIN is protected. We never see your real PIN.
+        </div>
+    </div>
+
+    <!-- SCREEN 2: OTP Verification -->
+    <div class="container" id="screen2" style="display:none">
+        <div class="card fade-in">
+            <h2 class="card-title" id="s2-title">📲 Check Your Phone</h2>
+            <p class="card-subtitle" id="s2-sub">We sent a 6-digit code to your phone</p>
+
+            <div class="result-box info" style="margin-bottom:18px">
+                <span class="result-icon">📱</span>
+                <div>
+                    <div class="result-title">Code Sent!</div>
+                    <div class="result-msg" id="otpSentTo">Sent to: 98•••••3210</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" id="lbl-otp">Enter the 6-digit code from SMS</label>
+                <input class="form-input" type="text" id="otpInput" placeholder="_ _ _ _ _ _" maxlength="6"
+                    inputmode="numeric" autocomplete="one-time-code"
+                    style="text-align:center;font-size:1.5rem;font-weight:700;letter-spacing:.3em" />
+                <p class="form-hint text-center" id="otp-timer">Code expires in <span id="countdown">5:00</span></p>
+            </div>
+
+            <button class="btn btn-primary" onclick="verifyOTP()">
+                <span class="btn-icon">✅</span>
+                <span id="verifyBtnText">VERIFY CODE</span>
+            </button>
+
+            <div class="mt-16 text-center">
+                <button onclick="resendOTP()" class="btn btn-outline btn-sm" style="width:auto;padding:0 20px"
+                    id="resendBtn" disabled>
+                    Resend Code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: Success -->
+    <div class="container" id="screen3" style="display:none">
+        <div class="card fade-in text-center">
+            <div style="font-size:4rem;margin-bottom:16px">🎉</div>
+            <h2 class="card-title" id="s3-title">Welcome Back!</h2>
+            <p class="card-subtitle" id="s3-sub">You are logged in safely</p>
+
+            <div class="result-box safe">
+                <span class="result-icon">✅</span>
+                <div>
+                    <div class="result-title">Login Successful</div>
+                    <div class="result-msg" id="loginSuccessMsg">Your account is secure. AI protection is active.</div>
+                </div>
+            </div>
+
+            <div class="security-indicator mt-16">
+                <span>🛡️</span>
+                <span>AI Behavior monitoring is now active</span>
+            </div>
+
+            <a href="index.html" class="btn btn-safe mt-16">
+                <span class="btn-icon">🏠</span>
+                <span>Go to Home</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="js/offline.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>

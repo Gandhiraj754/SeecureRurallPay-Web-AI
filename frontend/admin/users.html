@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management — SecureRuralPay Admin</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/mobile.css" />
+</head>
+
+<body style="background:#f1f5f9">
+    <header class="topbar" style="background:linear-gradient(135deg,#0f172a,#1e3a8a)">
+        <a href="dashboard.html" style="color:rgba(255,255,255,.7);font-size:0.85rem;text-decoration:none">←
+            Dashboard</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">👥</div><span>Users</span>
+        </div>
+        <span class="badge badge-info" id="userCountBadge">0 users</span>
+    </header>
+
+    <div class="container content-area" style="padding-top:20px;max-width:1200px">
+        <div class="form-group">
+            <input class="form-input" type="search" id="userSearch" placeholder="Search by phone number..."
+                oninput="filterUsers()" />
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-primary" onclick="filterRisk('all')">All Users</button>
+            <button class="btn btn-sm btn-outline" style="border-color:#dc2626;color:#dc2626"
+                onclick="filterRisk('high')">🔴 High Risk</button>
+            <button class="btn btn-sm btn-outline" style="border-color:#ca8a04;color:#ca8a04"
+                onclick="filterRisk('medium')">🟡 Medium Risk</button>
+            <button class="btn btn-sm btn-outline" style="border-color:#16a34a;color:#16a34a"
+                onclick="filterRisk('low')">🟢 Low Risk</button>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+            <div class="scroll-x">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Phone</th>
+                            <th>Risk Level</th>
+                            <th>Transactions</th>
+                            <th>Fraud Count</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span><span>Overview</span></a>
+        <a href="fraud-logs.html" class="nav-item"><span class="nav-item-icon">🚨</span><span>Fraud</span></a>
+        <a href="users.html" class="nav-item active"><span class="nav-item-icon">👥</span><span>Users</span></a>
+        <a href="model.html" class="nav-item"><span class="nav-item-icon">🤖</span><span>Model</span></a>
+        <a href="../index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>App</span></a>
+    </nav>
+
+    <script>
+        const users = Array.from({ length: 50 }, (_, i) => ({
+            phone: '9' + String(Math.floor(Math.random() * 9e8 + 1e8)),
+            risk: ['low', 'low', 'medium', 'high'][Math.floor(Math.random() * 4)],
+            txCount: Math.floor(Math.random() * 100 + 5),
+            fraudCount: Math.floor(Math.random() * 5),
+            active: Math.random() > 0.1
+        }));
+        let filtered = [...users];
+
+        function filterRisk(r) { filtered = r === 'all' ? [...users] : users.filter(u => u.risk === r); render(); }
+        function filterUsers() { const q = document.getElementById('userSearch').value; filtered = users.filter(u => u.phone.includes(q)); render(); }
+
+        function render() {
+            const riskBadge = { low: 'badge-safe', medium: 'badge-warn', high: 'badge-danger' };
+            document.getElementById('userCountBadge').textContent = filtered.length + ' users';
+            document.getElementById('usersBody').innerHTML = filtered.map(u => `
+        <tr>
+          <td style="font-weight:600">${u.phone.slice(0, 2)}•••${u.phone.slice(-4)}</td>
+          <td><span class="badge ${riskBadge[u.risk]}">${u.risk.toUpperCase()}</span></td>
+          <td>${u.txCount}</td>
+          <td style="color:${u.fraudCount ? '#dc2626' : '#16a34a'};font-weight:700">${u.fraudCount}</td>
+          <td><span class="badge ${u.active ? 'badge-safe' : 'badge-danger'}">${u.active ? 'Active' : 'Blocked'}</span></td>
+          <td>
+            <button class="btn btn-sm ${u.active ? 'btn-danger' : 'btn-safe'}" style="width:auto;padding:0 12px;min-height:32px;font-size:0.75rem" onclick="toggleUser(this)">
+              ${u.active ? 'Block' : 'Unblock'}
+            </button>
+          </td>
+        </tr>`).join('');
+        }
+
+        function toggleUser(btn) {
+            const isBlock = btn.textContent.trim() === 'Block';
+            btn.textContent = isBlock ? 'Unblock' : 'Block';
+            btn.className = `btn btn-sm ${isBlock ? 'btn-safe' : 'btn-danger'} btn-sm`;
+            alert(isBlock ? 'User blocked and notified via SMS.' : 'User account restored successfully.');
+        }
+        render();
+    </script>
+</body>
+
+</html>

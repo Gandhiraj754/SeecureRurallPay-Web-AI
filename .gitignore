@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Models and large datasets
+ml_training/datasets/
+backend/models/
+frontend/models/
+*.pkl
+*.tflite
+*.csv
+*.data
+*.gz
+*.json
+
+# Virtual environments
+.env
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Logs
+logs/
+*.log
+
+# Docker
+.dockerignore

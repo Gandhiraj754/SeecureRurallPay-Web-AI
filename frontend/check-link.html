@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check Website Link — SecureRuralPay</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+    <meta name="theme-color" content="#1d4ed8" />
+</head>
+
+<body>
+    <div class="offline-banner" id="offlineBanner" role="alert">
+        <span>📵</span><span data-i18n="offline-msg">Offline — Using local phishing database</span>
+    </div>
+
+    <header class="topbar">
+        <a href="index.html" class="btn btn-sm"
+            style="width:auto;min-height:36px;padding:0 12px;background:rgba(255,255,255,.15);color:#fff;font-weight:600">←
+            Back</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">🔗</div><span>Link Checker</span>
+        </div>
+        <button class="lang-toggle" onclick="toggleLang()">EN / हि</button>
+    </header>
+
+    <div class="container content-area" style="padding-top:20px">
+
+        <!-- Explainer -->
+        <div class="card fade-in" style="background:linear-gradient(135deg,#1e40af,#7c3aed);color:#fff">
+            <div style="font-size:2rem;margin-bottom:8px">🔗</div>
+            <h1 style="font-size:1.1rem;font-weight:800;margin-bottom:6px" data-i18n="link-hero-head">Check a Website
+                Link</h1>
+            <p style="font-size:0.88rem;opacity:.9;line-height:1.5" data-i18n="link-hero-sub">
+                Did someone send you a website link on WhatsApp or SMS?
+                Check it here <strong>before</strong> clicking!
+                Our AI detects fake bank websites in seconds.
+            </p>
+        </div>
+
+        <!-- Input -->
+        <div class="card">
+            <div class="form-group">
+                <label class="form-label" for="urlInput" data-i18n="link-lbl">🔗 Paste the link here:</label>
+                <input class="form-input" type="url" id="urlInput" placeholder="https://example.com"
+                    oninput="onUrlChange()" autocomplete="off" autocorrect="off" />
+                <p class="form-hint" data-i18n="link-hint">Copy the link and paste it in the box above</p>
+            </div>
+
+            <button class="btn btn-primary" id="scanBtn" onclick="scanLink()">
+                <span class="btn-icon">🔍</span>
+                <span data-i18n="link-btn">CHECK THIS LINK</span>
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div class="card" id="scanLoading" style="display:none">
+            <div class="loading-wrap">
+                <div class="spinner"></div>
+                <p class="loading-text" data-i18n="link-loading">Scanning link with AI...</p>
+            </div>
+            <div class="progress-wrap mt-12">
+                <div class="progress-label"><span id="scanStep">Checking URL features</span><span id="scanPct">0%</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-fill" id="scanProgress" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div id="scanResult" style="display:none">
+            <div class="card fade-in">
+                <h2 class="card-title">Scan Result</h2>
+                <div class="result-box" id="linkResultBox">
+                    <span class="result-icon" id="linkResultIcon">🔍</span>
+                    <div>
+                        <div class="result-title" id="linkResultTitle">Scanning...</div>
+                        <div class="result-msg" id="linkResultMsg"></div>
+                    </div>
+                </div>
+
+                <!-- Risk Score -->
+                <div class="risk-meter-wrap">
+                    <p class="risk-label">Risk Score</p>
+                    <div class="risk-score-num" id="linkRiskScore">--</div>
+                    <p class="risk-label">out of 100</p>
+                    <div class="meter-bar-bg" style="margin-top:8px">
+                        <div class="meter-bar-fill" id="linkRiskBar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Feature Breakdown -->
+                <h3 style="font-size:0.88rem;font-weight:700;margin:16px 0 10px;color:var(--color-muted)">What we
+                    checked:</h3>
+                <div id="featureList" style="display:flex;flex-direction:column;gap:8px"></div>
+
+                <!-- Action Buttons -->
+                <div id="resultActions" style="margin-top:20px;display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+        </div>
+
+        <!-- Demo Section -->
+        <div class="card" style="border-left:3px solid #7c3aed">
+            <p style="font-size:0.8rem;font-weight:700;color:#7c3aed;margin-bottom:8px">🧪 DEMO — Try these examples</p>
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="btn btn-sm"
+                    style="background:#dcfce7;color:#166534;justify-content:flex-start;font-weight:600"
+                    onclick="demo('https://www.sbi.co.in')">✅ sbi.co.in (Real bank)</button>
+                <button class="btn btn-sm"
+                    style="background:#fef9c3;color:#854d0e;justify-content:flex-start;font-weight:600"
+                    onclick="demo('https://sbi-secure-verify.co')">⚠️ sbi-secure-verify.co (Suspicious)</button>
+                <button class="btn btn-sm"
+                    style="background:#fee2e2;color:#991b1b;justify-content:flex-start;font-weight:600"
+                    onclick="demo('http://192.168.1.1/hdfc-login')">❌ IP-based fake bank login</button>
+                <button class="btn btn-sm"
+                    style="background:#fee2e2;color:#991b1b;justify-content:flex-start;font-weight:600"
+                    onclick="demo('https://paytm-reward.xyz/claim')">❌ paytm-reward.xyz (Phishing)</button>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="card">
+            <h2 class="card-title">🛡️ How to Stay Safe</h2>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                    <span style="font-size:1.1rem">✅</span>
+                    <p style="font-size:0.88rem">Real bank websites end in <strong>.co.in</strong> or
+                        <strong>.com</strong> — like sbi.co.in
+                    </p>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                    <span style="font-size:1.1rem">❌</span>
+                    <p style="font-size:0.88rem">Fake websites have hyphens — like sbi-<em>secure</em>-.in or
+                        sbi-<em>login</em>.xyz</p>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                    <span style="font-size:1.1rem">❌</span>
+                    <p style="font-size:0.88rem">Never click links that start with numbers like 192.168.1.1</p>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                    <span style="font-size:1.1rem">🔒</span>
+                    <p style="font-size:0.88rem">Safe websites show a lock 🔒 in your browser</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>Home</span></a>
+        <a href="send-money.html" class="nav-item"><span class="nav-item-icon">💸</span><span>Send</span></a>
+        <a href="check-link.html" class="nav-item active"><span class="nav-item-icon">🔗</span><span>Links</span></a>
+        <a href="history.html" class="nav-item"><span class="nav-item-icon">📋</span><span>History</span></a>
+        <a href="admin/dashboard.html" class="nav-item"><span class="nav-item-icon">⚙️</span><span>Admin</span></a>
+    </nav>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="js/offline.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/link-scanner.js"></script>
+</body>
+
+</html>

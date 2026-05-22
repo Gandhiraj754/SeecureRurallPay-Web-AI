@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="SecureRuralPay — AI-powered cybersecurity for rural digital banking. Protect your money with fraud detection, phishing protection, and offline AI." />
+  <title>SecureRuralPay — Safe Digital Banking</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/mobile.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1d4ed8" />
+  <link rel="apple-touch-icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>" />
+</head>
+
+<body>
+  <!-- Offline Banner -->
+  <div class="offline-banner" id="offlineBanner" role="alert">
+    <span>📵</span>
+    <span data-i18n="offline-msg">No internet — Working in safe offline mode</span>
+  </div>
+
+  <!-- Top Bar -->
+  <header class="topbar" role="banner">
+    <div class="topbar-brand">
+      <div class="brand-icon">🔐</div>
+      <div>
+        <div>SecureRuralPay</div>
+        <div style="font-size:0.65rem;opacity:.75;font-weight:400">AI Security v3.0</div>
+      </div>
+    </div>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLang()" aria-label="Switch language">
+      English / हिंदी
+    </button>
+  </header>
+
+  <!-- Security Indicator -->
+  <div class="container" style="padding-top:14px">
+    <div class="security-indicator fade-in">
+      <span>🛡️</span>
+      <span id="securityStatus">Your connection is secure and protected</span>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero fade-in">
+    <div class="hero-icon">🏦</div>
+    <h1 class="hero-title" id="heroTitle">SecureRuralPay</h1>
+    <p class="hero-sub" data-i18n="idx-hero-sub">Your money is always safe with AI protection</p>
+  </div>
+
+  <!-- Alert Strip -->
+  <div class="container">
+    <div class="alert-strip mt-16" data-i18n="idx-alert">
+      ⚠️ <strong>Security Tip:</strong> Never share your PIN or OTP with anyone — even bank staff!
+    </div>
+  </div>
+
+  <!-- Main Menu Grid -->
+  <div class="container">
+    <p class="section-header" data-i18n="idx-menu-label">What do you want to do?</p>
+    <div class="menu-grid">
+      <a href="login.html" class="menu-card" id="card-login">
+        <div class="menu-card-icon ic-blue">📱</div>
+        <div class="menu-card-label" data-i18n="idx-login">Login / Enter</div>
+      </a>
+      <a href="send-money.html" class="menu-card" id="card-send">
+        <div class="menu-card-icon ic-green">💸</div>
+        <div class="menu-card-label" data-i18n="idx-send">Send Money</div>
+      </a>
+      <a href="check-link.html" class="menu-card" id="card-link">
+        <div class="menu-card-icon ic-purple">🔗</div>
+        <div class="menu-card-label" data-i18n="idx-link">Check a Website</div>
+      </a>
+      <a href="check-pdf.html" class="menu-card" id="card-pdf">
+        <div class="menu-card-icon ic-orange">📄</div>
+        <div class="menu-card-label" data-i18n="idx-pdf">Check Bank Statement</div>
+      </a>
+      <a href="history.html" class="menu-card" id="card-hist">
+        <div class="menu-card-icon ic-teal">📋</div>
+        <div class="menu-card-label" data-i18n="idx-history">My History</div>
+      </a>
+      <a href="security-tips.html" class="menu-card" id="card-tips">
+        <div class="menu-card-icon" style="background:linear-gradient(135deg,#7c3aed,#db2777)">🛡️</div>
+        <div class="menu-card-label">Security Tips</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="container">
+    <p class="section-header" id="statsLabel">Your Protection Today</p>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-num" id="statFraud">0</div>
+        <div class="stat-label">Fraud Blocks Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statLink">12</div>
+        <div class="stat-label">Safe Links Used</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statTx">3</div>
+        <div class="stat-label">Safe Transactions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:#16a34a">✅</div>
+        <div class="stat-label">AI Active</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security Score Widget -->
+  <div class="container">
+    <div class="card fade-in" style="padding:16px;margin-top:0">
+      <div id="securityScoreWidget"></div>
+      <a href="security-tips.html"
+        style="display:block;margin-top:12px;font-size:0.85rem;font-weight:700;color:#7c3aed;text-align:center">🛡️ View
+        Security Tips & Scam Alerts</a>
+    </div>
+  </div>
+
+  <!-- Help FAQ -->
+  <div class="container content-area" id="helpSection" style="display:none">
+    <div class="card">
+      <h2 class="card-title">❓ Help &amp; FAQ</h2>
+      <p class="card-subtitle">Common questions answered simply</p>
+      <div class="accordion">
+        <div class="acc-item">
+          <button class="acc-btn" onclick="toggleAcc(this)" aria-expanded="false">
+            What is SecureRuralPay? <span class="acc-icon">▼</span>
+          </button>
+          <div class="acc-body">
+            SecureRuralPay protects your money when you do digital banking. It checks every payment and website link to
+            make sure it is safe. It works even without internet.
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" onclick="toggleAcc(this)" aria-expanded="false">
+            Is my data safe? <span class="acc-icon">▼</span>
+          </button>
+          <div class="acc-body">
+            Yes! Your data is protected with strong military-grade encryption (AES-256). Your PIN is never stored — only
+            a secure code. No personal data leaves your phone without your permission.
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" onclick="toggleAcc(this)" aria-expanded="false">
+            What if I have no internet? <span class="acc-icon">▼</span>
+          </button>
+          <div class="acc-body">
+            SecureRuralPay works offline! The AI protection runs on your phone. Transactions are saved securely and sent
+            when internet comes back.
+          </div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-btn" onclick="toggleAcc(this)" aria-expanded="false">
+            How do I check a fake website? <span class="acc-icon">▼</span>
+          </button>
+          <div class="acc-body">
+            Go to "Check a Website" on the home screen. Copy the website link and paste it there. Our AI checks it in
+            seconds and tells you if it is real or fake.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="nav-bottom" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-item active">
+      <span class="nav-item-icon">🏠</span>
+      <span>Home</span>
+    </a>
+    <a href="send-money.html" class="nav-item">
+      <span class="nav-item-icon">💸</span>
+      <span>Send</span>
+    </a>
+    <a href="check-link.html" class="nav-item">
+      <span class="nav-item-icon">🔗</span>
+      <span>Links</span>
+    </a>
+    <a href="history.html" class="nav-item">
+      <span class="nav-item-icon">📋</span>
+      <span>History</span>
+    </a>
+    <a href="admin/dashboard.html" class="nav-item">
+      <span class="nav-item-icon">⚙️</span>
+      <span>Admin</span>
+    </a>
+  </nav>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/offline.js"></script>
+  <script>
+    // ── Language Translations ──────────────────────────────────────
+    const translations = {
+      en: {
+        securityStatus: 'Your connection is secure and protected',
+        heroTitle: 'SecureRuralPay',
+        heroSub: 'Your money is always safe with AI protection',
+        alertStrip: '⚠️ <strong>Security Tip:</strong> Never share your PIN or OTP with anyone — even bank staff!',
+        menuLabel: 'What do you want to do?',
+        statsLabel: 'Your Protection Today',
+        'ml-login': 'Login / Enter',
+        'ml-send': 'Send Money',
+        'ml-link': 'Check a Website',
+        'ml-pdf': 'Check Bank Statement',
+        'ml-hist': 'My History',
+        'ml-help': 'Help',
+      },
+      hi: {
+        securityStatus: 'आपका कनेक्शन सुरक्षित है',
+        heroTitle: 'सिक्योर रूरल पे',
+        heroSub: 'आपका पैसा हमेशा AI सुरक्षा के साथ सुरक्षित है',
+        alertStrip: '⚠️ <strong>सुरक्षा सलाह:</strong> अपना PIN या OTP कभी किसी को न बताएं!',
+        menuLabel: 'आप क्या करना चाहते हैं?',
+        statsLabel: 'आज की सुरक्षा',
+        'ml-login': 'लॉगिन / प्रवेश',
+        'ml-send': 'पैसे भेजें',
+        'ml-link': 'वेबसाइट जाँचें',
+        'ml-pdf': 'बैंक स्टेटमेंट जाँचें',
+        'ml-hist': 'मेरा इतिहास',
+        'ml-help': 'सहायता',
+      }
+    };
+
+    let currentLang = localStorage.getItem('srp_lang') || 'en';
+
+    function applyTranslations(lang) {
+      const t = translations[lang];
+      Object.keys(t).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = t[id];
+      });
+      document.documentElement.lang = lang === 'hi' ? 'hi' : 'en';
+    }
+
+    function toggleLang() {
+      currentLang = currentLang === 'en' ? 'hi' : 'en';
+      localStorage.setItem('srp_lang', currentLang);
+      applyTranslations(currentLang);
+      document.getElementById('langToggle').textContent = currentLang === 'hi' ? 'हिंदी / English' : 'English / हिंदी';
+      showToast('🌐 Language changed', 'info');
+    }
+
+    function toggleAcc(btn) {
+      const body = btn.nextElementSibling;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', !expanded);
+      body.classList.toggle('open', !expanded);
+    }
+
+    function showHelp() {
+      const s = document.getElementById('helpSection');
+      s.style.display = s.style.display === 'none' ? 'block' : 'none';
+      s.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ── Fraud counter animation ──────────────────────────────────
+    function animateCounter(el, target) {
+      let count = 0;
+      const step = Math.ceil(target / 30);
+      const timer = setInterval(() => {
+        count = Math.min(count + step, target);
+        el.textContent = count;
+        if (count >= target) clearInterval(timer);
+      }, 40);
+    }
+
+    // ── Init ──────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTranslations(currentLang);
+      const statFraud = localStorage.getItem('srp_fraud_blocked') || 0;
+      animateCounter(document.getElementById('statFraud'), parseInt(statFraud));
+
+      // Show admin link if admin logged in
+      if (sessionStorage.getItem('srp_admin')) {
+        document.querySelector('[href="admin/dashboard.html"]').style.display = 'flex';
+      }
+    });
+  </script>
+  <script src="js/i18n.js"></script>
+</body>
+
+</html>

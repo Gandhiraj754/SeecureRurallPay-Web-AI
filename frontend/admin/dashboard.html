@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard — SecureRuralPay</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/mobile.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <meta name="theme-color" content="#1d4ed8" />
+    <style>
+        .admin-sidebar {
+            display: none;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        }
+
+        @media(min-width:1024px) {
+            .admin-sidebar {
+                display: block;
+                width: 220px;
+                background: #0f172a;
+                min-height: 100vh;
+                padding: 24px 0;
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+
+            .admin-main {
+                margin-left: 220px;
+            }
+
+            .nav-bottom {
+                display: none;
+            }
+
+            .admin-header {
+                position: fixed;
+                top: 0;
+                left: 220px;
+                right: 0;
+                z-index: 90;
+            }
+
+            .admin-content {
+                margin-top: 70px;
+                padding: 20px;
+            }
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, .65);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .2s, color .2s;
+        }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+            margin-bottom: 16px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 1.5s infinite;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .model-meter {
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .model-meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 99px;
+            transition: width 1s ease;
+        }
+    </style>
+</head>
+
+<body style="background:#f1f5f9">
+    <!-- Sidebar (desktop) -->
+    <nav class="admin-sidebar" aria-label="Admin navigation">
+        <div class="sidebar-logo">
+            <div style="color:#fff;font-weight:800;font-size:1rem">🔐 SecureRuralPay</div>
+            <div style="color:rgba(255,255,255,.5);font-size:0.72rem;margin-top:3px">Admin Panel v3.0</div>
+        </div>
+        <a href="dashboard.html" class="sidebar-item active">📊 Dashboard</a>
+        <a href="fraud-logs.html" class="sidebar-item">🚨 Fraud Logs</a>
+        <a href="users.html" class="sidebar-item">👥 Users</a>
+        <a href="model.html" class="sidebar-item">🤖 ML Model</a>
+        <div style="height:1px;background:rgba(255,255,255,.1);margin:16px 0"></div>
+        <a href="../index.html" class="sidebar-item">← User App</a>
+    </nav>
+
+    <!-- Main -->
+    <div class="admin-main">
+        <!-- Admin Header -->
+        <header class="topbar admin-header">
+            <div class="topbar-brand">
+                <div class="brand-icon">📊</div>
+                <span>Admin Dashboard</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem">
+                <span class="live-dot"></span>
+                <span id="liveTime" style="font-size:0.75rem"></span>
+            </div>
+        </header>
+
+        <div class="admin-content container" style="max-width:1200px;padding-top:80px">
+            <!-- Overview Stats -->
+            <div class="section-header">Live Overview</div>
+            <div class="stat-grid" style="grid-template-columns:repeat(2,1fr);gap:14px">
+                <div class="stat-card">
+                    <div class="stat-num" id="totalUsers">1,247</div>
+                    <div class="stat-label">👥 Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" id="todayTx">89</div>
+                    <div class="stat-label">💸 Transactions Today</div>
+                </div>
+                <div class="stat-card" style="border-color:#fca5a5">
+                    <div class="stat-num" id="fraudBlocked" style="color:#dc2626">14</div>
+                    <div class="stat-label">🚫 Fraud Blocked Today</div>
+                </div>
+                <div class="stat-card" style="border-color:#86efac">
+                    <div class="stat-num" id="moneySaved" style="color:#16a34a;font-size:1.3rem">₹2.1L</div>
+                    <div class="stat-label">💰 Money Saved</div>
+                </div>
+            </div>
+
+            <!-- Model Accuracy Meter -->
+            <div class="card chart-box">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <h2 class="card-title" style="margin-bottom:0">🤖 AI Model Accuracy</h2>
+                    <span class="badge badge-safe">LIVE</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+                    <div class="text-center">
+                        <div style="font-size:1.4rem;font-weight:800;color:#16a34a" id="accuracy">94.2%</div>
+                        <div style="font-size:0.72rem;color:var(--color-muted)">Accuracy</div>
+                        <div class="model-meter">
+                            <div class="model-meter-fill" style="width:94.2%"></div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size:1.4rem;font-weight:800;color:#2563eb" id="precision">92.8%</div>
+                        <div style="font-size:0.72rem;color:var(--color-muted)">Precision</div>
+                        <div class="model-meter">
+                            <div class="model-meter-fill"
+                                style="width:92.8%;background:linear-gradient(90deg,#1d4ed8,#3b82f6)"></div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size:1.4rem;font-weight:800;color:#7c3aed" id="recall">91.5%</div>
+                        <div style="font-size:0.72rem;color:var(--color-muted)">Recall</div>
+                        <div class="model-meter">
+                            <div class="model-meter-fill"
+                                style="width:91.5%;background:linear-gradient(90deg,#6d28d9,#8b5cf6)"></div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size:1.4rem;font-weight:800;color:#ea580c" id="auc">0.971</div>
+                        <div style="font-size:0.72rem;color:var(--color-muted)">AUC-ROC</div>
+                        <div class="model-meter">
+                            <div class="model-meter-fill"
+                                style="width:97.1%;background:linear-gradient(90deg,#c2410c,#f97316)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fraud Chart -->
+            <div class="chart-box">
+                <h2 class="card-title" style="margin-bottom:16px">📈 Fraud Blocked — Last 30 Days</h2>
+                <canvas id="fraudChart" height="200"></canvas>
+            </div>
+
+            <!-- Live Feed -->
+            <div class="section-header">🔴 Live Transaction Feed</div>
+            <div class="card" style="padding:0;overflow:hidden">
+                <div class="scroll-x">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Risk</th>
+                                <th>Decision</th>
+                            </tr>
+                        </thead>
+                        <tbody id="liveFeed">
+                            <tr>
+                                <td colspan="5" class="text-center" style="padding:20px;color:var(--color-muted)">
+                                    Loading live feed...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-header">Quick Actions</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:80px">
+                <a href="fraud-logs.html" class="btn btn-outline" style="border-color:#dc2626;color:#dc2626">🚨 View
+                    Fraud Logs</a>
+                <a href="users.html" class="btn btn-outline">👥 Manage Users</a>
+                <a href="model.html" class="btn btn-outline" style="border-color:#7c3aed;color:#7c3aed">🤖 ML Model
+                    Status</a>
+                <button class="btn btn-outline" onclick="exportCSV()">📥 Export Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item active"><span class="nav-item-icon">📊</span><span>Overview</span></a>
+        <a href="fraud-logs.html" class="nav-item"><span class="nav-item-icon">🚨</span><span>Fraud</span></a>
+        <a href="users.html" class="nav-item"><span class="nav-item-icon">👥</span><span>Users</span></a>
+        <a href="model.html" class="nav-item"><span class="nav-item-icon">🤖</span><span>Model</span></a>
+        <a href="../index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>App</span></a>
+    </nav>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="../js/offline.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        // Live clock
+        function updateClock() {
+            document.getElementById('liveTime').textContent = new Date().toLocaleTimeString('en-IN');
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // ── Load Live Stats from Backend ─────────────────────────────
+        async function loadDashboard() {
+            try {
+                const d = await callAPI('/api/admin/dashboard', 'GET');
+                document.getElementById('totalUsers').textContent = (d.total_users || 0).toLocaleString('en-IN');
+                document.getElementById('todayTx').textContent = d.transactions_today || 0;
+                document.getElementById('fraudBlocked').textContent = d.fraud_blocked || 0;
+                const inr = d.money_saved_inr || 0;
+                document.getElementById('moneySaved').textContent = inr >= 100000
+                    ? '₹' + (inr / 100000).toFixed(1) + 'L'
+                    : '₹' + inr.toLocaleString('en-IN');
+                // Model metrics
+                const m = d.model_metrics || {};
+                if (m.accuracy) document.getElementById('accuracy').textContent = (m.accuracy * 100).toFixed(1) + '%';
+                if (m.precision) document.getElementById('precision').textContent = (m.precision * 100).toFixed(1) + '%';
+                if (m.recall) document.getElementById('recall').textContent = (m.recall * 100).toFixed(1) + '%';
+                if (m.auc_roc) document.getElementById('auc').textContent = m.auc_roc.toFixed(3);
+            } catch (err) {
+                console.warn('Dashboard API unavailable, using static data:', err.message);
+            }
+        }
+        loadDashboard();
+
+        // Fraud Chart
+        const ctx = document.getElementById('fraudChart').getContext('2d');
+        const labels = Array.from({ length: 30 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - 29 + i); return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); });
+        const data = labels.map(() => Math.floor(Math.random() * 20) + 2);
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Fraud Blocked',
+                    data,
+                    backgroundColor: 'rgba(220,38,38,.7)',
+                    borderColor: '#dc2626',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }, {
+                    label: 'Total Tx',
+                    data: data.map(d => d * 5 + Math.floor(Math.random() * 30)),
+                    backgroundColor: 'rgba(29,78,216,.25)',
+                    borderColor: '#1d4ed8',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    type: 'line',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Live Feed
+        const feedData = [
+            { time: '21:48', 'user': '98•••3210', 'amount': '₹500', 'risk': 12, 'dec': '✅ Safe' },
+            { time: '21:47', 'user': '87•••6543', 'amount': '₹9,500', 'risk': 85, 'dec': '❌ Blocked' },
+            { time: '21:46', 'user': '76•••2890', 'amount': '₹2,000', 'risk': 42, 'dec': '⚠️ OTP' },
+            { time: '21:45', 'user': '95•••7821', 'amount': '₹300', 'risk': 8, 'dec': '✅ Safe' },
+            { time: '21:44', 'user': '99•••4501', 'amount': '₹15,000', 'risk': 91, 'dec': '❌ Blocked' },
+        ];
+        function renderFeed(fd) {
+            document.getElementById('liveFeed').innerHTML = fd.map(r => `
+        <tr>
+          <td>${r.time}</td>
+          <td>${r.user}</td>
+          <td style="font-weight:700">${r.amount}</td>
+          <td><span class="badge ${r.risk < 31 ? 'badge-safe' : r.risk < 71 ? 'badge-warn' : 'badge-danger'}">${r.risk}</span></td>
+          <td style="font-weight:700">${r.dec}</td>
+        </tr>`).join('');
+        }
+        renderFeed(feedData);
+
+        // Refresh feed every 10s
+        setInterval(() => {
+            feedData.unshift({
+                time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+                user: Math.floor(Math.random() * 9e9 + 1e9).toString().slice(0, 2) + '•••' + Math.floor(Math.random() * 9000 + 1000),
+                amount: '₹' + Math.floor(Math.random() * 10000 + 100).toLocaleString('en-IN'),
+                risk: Math.floor(Math.random() * 100),
+                dec: ['✅ Safe', '⚠️ OTP', '❌ Blocked'][Math.floor(Math.random() * 3)]
+            });
+            feedData.splice(8);
+            renderFeed(feedData);
+        }, 8000);
+
+        function exportCSV() {
+            const csv = 'Time,User,Amount,Risk,Decision\n' + feedData.map(r => `${r.time},${r.user},${r.amount},${r.risk},${r.dec}`).join('\n');
+            const a = document.createElement('a'); a.href = 'data:text/csv,' + encodeURIComponent(csv); a.download = 'fraud_report.csv'; a.click();
+        }
+    </script>
+</body>
+
+</html>

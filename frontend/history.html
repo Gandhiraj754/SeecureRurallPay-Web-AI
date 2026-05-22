@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta name="author" content="Dhanush Sai Gandhiraj Chinta">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Transactions — SecureRuralPay</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+    <meta name="theme-color" content="#1d4ed8" />
+</head>
+
+<body>
+    <div class="offline-banner" id="offlineBanner" role="alert">
+        <span>📵</span><span data-i18n="offline-msg">Offline — Showing saved history</span>
+    </div>
+
+    <header class="topbar">
+        <a href="index.html" class="btn btn-sm"
+            style="width:auto;min-height:36px;padding:0 12px;background:rgba(255,255,255,.15);color:#fff;font-weight:600">←
+            Back</a>
+        <div class="topbar-brand">
+            <div class="brand-icon">📋</div><span data-i18n="hist-title">My History</span>
+        </div>
+        <button class="lang-toggle" onclick="toggleLang()">EN / हि</button>
+    </header>
+
+    <div class="container content-area" style="padding-top:20px">
+        <!-- Summary Stats -->
+        <div class="stat-grid" style="margin-top:0">
+            <div class="stat-card text-center">
+                <div class="stat-num" id="totalCount">0</div>
+                <div class="stat-label" data-i18n="hist-total">Total Payments</div>
+            </div>
+            <div class="stat-card text-center">
+                <div class="stat-num" id="fraudCount" style="color:#dc2626">0</div>
+                <div class="stat-label" data-i18n="hist-fraud">Fraud Blocked</div>
+            </div>
+            <div class="stat-card text-center">
+                <div class="stat-num" id="safeCount" style="color:#16a34a">0</div>
+                <div class="stat-label" data-i18n="hist-safe">Safe Payments</div>
+            </div>
+            <div class="stat-card text-center">
+                <div class="stat-num" id="savedAmount" style="color:#16a34a;font-size:1.2rem">₹0</div>
+                <div class="stat-label" data-i18n="hist-saved">Fraud Saved</div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto" role="tablist">
+            <button class="btn btn-sm btn-primary" id="tab-all" onclick="filterTx('all')" role="tab"
+                aria-selected="true" data-i18n="hist-tab-all">All</button>
+            <button class="btn btn-sm btn-outline" id="tab-safe" onclick="filterTx('safe')" role="tab"
+                aria-selected="false" data-i18n="hist-tab-safe">✅ Safe</button>
+            <button class="btn btn-sm btn-outline" id="tab-warn" onclick="filterTx('warn')" role="tab"
+                aria-selected="false" data-i18n="hist-tab-warn">⚠️ Checked</button>
+            <button class="btn btn-sm btn-outline" id="tab-fraud" onclick="filterTx('fraud')" role="tab"
+                aria-selected="false" data-i18n="hist-tab-fraud">❌ Fraud</button>
+        </div>
+
+        <!-- Transaction List -->
+        <div class="tx-list" id="txList">
+            <div class="loading-wrap">
+                <div class="spinner"></div>
+                <p class="loading-text">Loading your transactions...</p>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="card text-center" id="emptyState" style="display:none">
+            <div style="font-size:3rem;margin-bottom:10px">📭</div>
+            <h2 class="card-title" data-i18n="hist-empty-title">No Transactions Yet</h2>
+            <p class="card-subtitle" data-i18n="hist-empty-sub">Your payment history will appear here</p>
+            <a href="send-money.html" class="btn btn-primary mt-16" data-i18n="hist-send-btn">💸 Send a Payment</a>
+        </div>
+
+        <!-- Load More -->
+        <button class="btn btn-outline mt-16" id="loadMoreBtn" onclick="loadMore()" style="display:none"
+            data-i18n="hist-load-more">
+            Load More Transactions
+        </button>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="index.html" class="nav-item"><span class="nav-item-icon">🏠</span><span>Home</span></a>
+        <a href="send-money.html" class="nav-item"><span class="nav-item-icon">💸</span><span>Send</span></a>
+        <a href="check-link.html" class="nav-item"><span class="nav-item-icon">🔗</span><span>Links</span></a>
+        <a href="history.html" class="nav-item active"><span class="nav-item-icon">📋</span><span>History</span></a>
+        <a href="admin/dashboard.html" class="nav-item"><span class="nav-item-icon">⚙️</span><span>Admin</span></a>
+    </nav>
+
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+    <script src="js/offline.js"></script>
+    <script src="js/i18n.js"></script>
+    <script>
+        let allTx = [];
+        let currentFilter = 'all';
+        let page = 0;
+        const pageSize = 10;
+
+        // Simulated transaction history
+        function generateHistory() {
+            const merchants = ['UPI/9876543210', 'UPI/shopkeeper@upi', 'ATM/SBIN0001234', 'NEFT/HDFC', 'UPI/friend@paytm', 'UPI/UNKNOWN_MERCHANT'];
+            const types = ['safe', 'safe', 'safe', 'warn', 'safe', 'fraud'];
+            const amounts = [500, 1200, 2000, 9500, 750, 15000, 300, 4800];
+            const reasons = { safe: 'Normal payment', warn: 'Unusual time/amount', fraud: 'Unknown merchant + midnight' };
+            const tx = [];
+            const now = new Date();
+            for (let i = 0; i < 25; i++) {
+                const d = new Date(now.getTime() - i * 24 * 3600000);
+                const t = types[Math.floor(Math.random() * types.length)];
+                const a = amounts[Math.floor(Math.random() * amounts.length)];
+                const m = merchants[Math.floor(Math.random() * merchants.length)];
+                tx.push({
+                    id: 'TX' + String(i + 1).padStart(4, '0'),
+                    date: d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
+                    amount: a,
+                    merchant: m,
+                    type: t,
+                    riskScore: t === 'safe' ? Math.floor(Math.random() * 30) : t === 'warn' ? 40 + Math.floor(Math.random() * 30) : 72 + Math.floor(Math.random() * 28),
+                    reason: reasons[t]
+                });
+            }
+            return tx;
+        }
+
+        function renderTx(txList) {
+            const el = document.getElementById('txList');
+            if (!txList.length) {
+                el.innerHTML = '';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+            document.getElementById('emptyState').style.display = 'none';
+            el.innerHTML = txList.map(tx => `
+        <div class="tx-item fade-in">
+          <div class="tx-icon ${tx.type === 'safe' ? 'ic-green' : tx.type === 'warn' ? 'ic-orange' : 'ic-pink'}">
+            ${tx.type === 'safe' ? '✅' : tx.type === 'warn' ? '⚠️' : '❌'}
+          </div>
+          <div class="tx-body">
+            <div class="tx-name">${tx.merchant}</div>
+            <div class="tx-date">${tx.date} • Risk: ${tx.riskScore}</div>
+          </div>
+          <div>
+            <div class="tx-amount">₹${tx.amount.toLocaleString('en-IN')}</div>
+            <div class="tx-status ${tx.type}">${tx.type === 'safe' ? '✅ Safe' : tx.type === 'warn' ? '⚠️ Checked' : '❌ FRAUD'}</div>
+          </div>
+        </div>
+      `).join('');
+        }
+
+        function filterTx(type) {
+            currentFilter = type;
+            page = 0;
+            ['all', 'safe', 'warn', 'fraud'].forEach(t => {
+                const btn = document.getElementById('tab-' + t);
+                btn.className = t === type ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline';
+                btn.setAttribute('aria-selected', t === type);
+            });
+            const filtered = type === 'all' ? allTx : allTx.filter(t => t.type === type);
+            renderTx(filtered.slice(0, pageSize));
+            document.getElementById('loadMoreBtn').style.display = filtered.length > pageSize ? 'flex' : 'none';
+        }
+
+        function loadMore() {
+            page++;
+            const filtered = currentFilter === 'all' ? allTx : allTx.filter(t => t.type === currentFilter);
+            const items = filtered.slice(0, (page + 1) * pageSize);
+            renderTx(items);
+            if (items.length >= filtered.length) document.getElementById('loadMoreBtn').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load from localStorage or generate demo
+            const stored = localStorage.getItem('srp_history');
+            allTx = stored ? JSON.parse(stored) : generateHistory();
+
+            const fraud = allTx.filter(t => t.type === 'fraud');
+            const safe = allTx.filter(t => t.type === 'safe');
+            document.getElementById('totalCount').textContent = allTx.length;
+            document.getElementById('fraudCount').textContent = fraud.length;
+            document.getElementById('safeCount').textContent = safe.length;
+            const saved = fraud.reduce((s, t) => s + t.amount, 0);
+            document.getElementById('savedAmount').textContent = '₹' + saved.toLocaleString('en-IN');
+
+            filterTx('all');
+        });
+
+        function toggleLang() { }
+    </script>
+</body>
+
+</html>
